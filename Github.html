@@ -471,11 +471,11 @@ function App() {
     setRecordState("processing");
     setRecordError("");
     try {
-      const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      const resp = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json","Authorization":"Bearer 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 },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
+          model: "gpt-40-mini",
           max_tokens: 800,
           messages: [{
             role: "user",
@@ -499,7 +499,7 @@ Raw notes:
         })
       });
       const data = await resp.json();
-      const summary = data.content?.map(b => b.text||"").join("") || "Could not summarise.";
+      const summary = data.choices?.map(b => b.text||"").join("") || "Could not summarise.";
       const newNote = {
         id: Date.now(),
         account: noteAccount || "General",
@@ -1055,4 +1055,5 @@ Best,
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
 </body>
+
 </html>
