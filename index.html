@@ -9,15 +9,31 @@
 <meta name="theme-color" content="#0c0e12">
 <title>X-Pak Field Sales</title>
 <script>
-const manifestData = {
-  name: "X-Pak Field Sales",short_name: "X-Pak",start_url: ".",display: "standalone",
-  background_color: "#0c0e12",theme_color: "#0c0e12",
-  icons: [{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230c0e12'/><text x='50' y='68' font-size='60' text-anchor='middle' fill='%23f5a623' font-family='Arial Black'>X</text></svg>",sizes:"any",type:"image/svg+xml"}]
-};
-const blob = new Blob([JSON.stringify(manifestData)],{type:'application/json'});
+const manifestData={name:"X-Pak Field Sales",short_name:"X-Pak",start_url:".",display:"standalone",background_color:"#0c0e12",theme_color:"#0c0e12",icons:[{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230c0e12'/><text x='50' y='68' font-size='60' text-anchor='middle' fill='%23f5a623' font-family='Arial Black'>X</text></svg>",sizes:"any",type:"image/svg+xml"}]};
+const blob=new Blob([JSON.stringify(manifestData)],{type:'application/json'});
 document.write('<link rel="manifest" href="'+URL.createObjectURL(blob)+'">');
 </script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+  try{
+    firebase.initializeApp({apiKey:"AIzaSyChsz_uG6d2I1eIMpwjJWikCVMuLevnW2A",authDomain:"xpak-field-sales.firebaseapp.com",projectId:"xpak-field-sales",storageBucket:"xpak-field-sales.firebasestorage.app",messagingSenderId:"1081261518456",appId:"1:1081261518456:web:9852b74954f3b81376478d"});
+    const db=firebase.firestore();
+    window.FB={
+      saveTrips:async(t)=>db.collection("xpak").doc("trips").set({trips:t,updatedAt:Date.now()}),
+      loadTrips:async()=>{const s=await db.collection("xpak").doc("trips").get();return s.exists?s.data().trips:[];},
+      saveVisits:async(id,v)=>db.collection("xpak_visits").doc(id).set({visits:v,updatedAt:Date.now()}),
+      loadVisits:async(id)=>{const s=await db.collection("xpak_visits").doc(id).get();return s.exists?s.data().visits:[];},
+      saveNotes:async(id,n)=>db.collection("xpak_notes").doc(id).set({notes:n,updatedAt:Date.now()}),
+      loadNotes:async(id)=>{const s=await db.collection("xpak_notes").doc(id).get();return s.exists?s.data().notes:[];},
+    };
+    window.FB_READY=true;
+  }catch(e){window.FB_READY=false;}
+  window.dispatchEvent(new Event("fb-ready"));
+})();
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -27,7 +43,6 @@ document.write('<link rel="manifest" href="'+URL.createObjectURL(blob)+'">');
   --red:#e8441a;--red-dim:rgba(232,68,26,0.12);
   --green:#2dd87a;--green-dim:rgba(45,216,122,0.1);
   --blue:#4b9cf5;--blue-dim:rgba(75,156,245,0.1);
-  --yellow:#f5e642;--yellow-dim:rgba(245,230,66,0.1);
   --text:#dde3f0;--muted:#6b7899;
   --mono:'DM Mono',monospace;--display:'Barlow Condensed',sans-serif;--body:'Barlow',sans-serif;
 }
@@ -35,127 +50,125 @@ html,body{height:100%;overflow:hidden}
 body{font-family:var(--body);background:var(--bg);color:var(--text)}
 #root{height:100%}
 .app{max-width:500px;margin:0 auto;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-
-/* HEADER */
 .hdr{background:var(--s1);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0) 0 0;flex-shrink:0}
-.hdr-top{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 8px}
-.logo{font-family:var(--display);font-weight:900;font-size:26px;letter-spacing:2px;color:var(--accent)}
-.logo em{font-style:normal;color:var(--text)}
-.hdr-chips{display:flex;gap:6px}
-.chip{font-family:var(--mono);font-size:10px;font-weight:500;padding:3px 8px;border-radius:4px;border:1px solid var(--border2);color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.hdr-top{display:flex;justify-content:space-between;align-items:center;padding:10px 16px 6px}
+.logo-wrap{display:flex;align-items:center;gap:10px}
+.logo-box{width:36px;height:36px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:900;font-size:26px;color:#000;flex-shrink:0;line-height:1}
+.logo-text{display:flex;flex-direction:column;line-height:1}
+.logo-name{font-family:var(--display);font-weight:900;font-size:20px;letter-spacing:2px;color:var(--text)}
+.logo-sub{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.hdr-chips{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.chip{font-family:var(--mono);font-size:9px;font-weight:500;padding:3px 7px;border-radius:4px;border:1px solid var(--border2);color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent}
 .chip.active{border-color:var(--accent);color:var(--accent)}
-.hdr-sub{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:0 16px 6px}
-.tabs{display:flex;overflow-x:auto;padding:0 16px;gap:0;border-top:1px solid var(--border);scrollbar-width:none}
+.sync-bar{display:flex;align-items:center;gap:6px;padding:3px 16px 5px;font-family:var(--mono);font-size:9px}
+.sync-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sync-dot.ok{background:var(--green)}.sync-dot.syncing{background:var(--accent);animation:pulse 1s infinite}.sync-dot.err{background:var(--red)}.sync-dot.offline{background:var(--muted)}
+.tabs{display:flex;overflow-x:auto;padding:0 12px;border-top:1px solid var(--border);scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:all 0.15s}
+.tab{font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:9px 12px;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:all .15s}
 .tab.on{color:var(--accent);border-bottom-color:var(--accent)}
-
-/* CONTENT */
-.content{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch;padding-bottom:max(80px,env(safe-area-inset-bottom,80px))}
-
-/* CARDS */
-.section-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
+.content{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch;padding-bottom:max(80px,env(safe-area-inset-bottom,80px))}
 .sec-label{font-family:var(--display);font-weight:900;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
-.field{margin-bottom:12px}
+.field{margin-bottom:11px}
 .lbl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px}
 .inp{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:10px 12px;color:var(--text);font-family:var(--body);font-size:16px;outline:none;-webkit-appearance:none}
 .inp:focus{border-color:var(--accent)}
 .inp::placeholder{color:var(--muted)}
-select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7899' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
-textarea.inp{min-height:80px;resize:none;line-height:1.5;font-size:14px}
-
-/* SYNC STATUS */
-.sync-bar{display:flex;align-items:center;gap:6px;padding:4px 16px 6px;font-family:var(--mono);font-size:9px}
-.sync-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.sync-dot.ok{background:var(--green)}
-.sync-dot.syncing{background:var(--accent);animation:pulse 1s infinite}
-.sync-dot.err{background:var(--red)}
-.sync-dot.offline{background:var(--muted)}
-
-/* TRIP HOME */
-.trip-home{display:flex;flex-direction:column;gap:12px}
-.trip-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all 0.15s}
-.trip-card:active{background:var(--s2)}
+select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7899' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
+textarea.inp{min-height:75px;resize:none;line-height:1.5;font-size:14px}
+.inp-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.section-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
+.alert-inline{background:var(--red-dim);border:1px solid rgba(232,68,26,.35);border-radius:5px;padding:6px 10px;font-size:11px;color:#f07060;margin-bottom:9px;display:flex;align-items:center;gap:5px}
+.save-banner{background:var(--green-dim);border:1px solid var(--green);border-radius:5px;padding:6px 12px;font-size:11px;color:var(--green);text-align:center;margin-bottom:12px;font-weight:600}
+.btn{width:100%;padding:13px;border:none;border-radius:6px;font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .15s;margin-bottom:8px;-webkit-tap-highlight-color:transparent}
+.btn-accent{background:var(--accent);color:#000}
+.btn-fire{background:linear-gradient(135deg,#c73812,#f5a623);color:#fff}
+.btn-ghost{background:var(--s2);border:1px solid var(--border);color:var(--text)}
+.btn-green{background:var(--green);color:#000}
+.btn-blue{background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue)}
+.btn:disabled{opacity:.4;pointer-events:none}
+.fab{position:fixed;bottom:max(20px,env(safe-area-inset-bottom,20px));right:16px;width:54px;height:54px;background:var(--accent);border:none;border-radius:50%;font-size:24px;cursor:pointer;box-shadow:0 4px 20px rgba(245,166,35,.4);display:flex;align-items:center;justify-content:center;z-index:200;-webkit-tap-highlight-color:transparent}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:flex;align-items:flex-end}
+.modal{background:var(--s1);border-radius:16px 16px 0 0;padding:20px;padding-bottom:max(20px,env(safe-area-inset-bottom,20px));width:100%;max-height:90vh;overflow-y:auto}
+.modal-title{font-family:var(--display);font-weight:900;font-size:18px;letter-spacing:1px;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+/* TRIP CARDS */
+.trip-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:15px;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-bottom:10px;transition:border-color .15s}
 .trip-card.active-trip{border-color:var(--accent)}
-.trip-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.trip-card:active{background:var(--s2)}
 .trip-name{font-family:var(--display);font-weight:900;font-size:18px;letter-spacing:1px}
 .trip-dates{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
-.trip-stats-row{display:flex;gap:12px;margin-top:8px}
-.trip-stat{font-family:var(--display);font-weight:700}
-.trip-stat span{font-size:18px;color:var(--green)}
-.trip-stat label{font-size:9px;color:var(--muted);display:block;text-transform:uppercase;letter-spacing:1px}
-.trip-status-chip{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:1px;padding:3px 8px;border-radius:4px}
-.trip-status-chip.active{background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent)}
-.trip-status-chip.archived{background:var(--s3);border:1px solid var(--border2);color:var(--muted)}
-.new-trip-btn{width:100%;padding:18px;background:transparent;border:2px dashed var(--border2);border-radius:10px;color:var(--muted);font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all 0.15s}
-.new-trip-btn:active{border-color:var(--accent);color:var(--accent)}
-
+.trip-stats-row{display:flex;gap:14px;margin-top:8px}
+.trip-stat span{font-family:var(--display);font-size:18px;color:var(--green);font-weight:700;display:block}
+.trip-stat label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.status-chip{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:1px;padding:3px 8px;border-radius:4px}
+.chip-active{background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent)}
+.chip-archived{background:var(--s3);border:1px solid var(--border2);color:var(--muted)}
+.new-trip-btn{width:100%;padding:16px;background:transparent;border:2px dashed var(--border2);border-radius:10px;color:var(--muted);font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-bottom:20px}
 /* IMPORT */
 .import-step{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px}
-.import-step-num{font-family:var(--display);font-weight:900;font-size:24px;color:var(--accent);margin-bottom:4px}
-.import-step-title{font-size:13px;font-weight:600;margin-bottom:6px}
-.import-step-desc{font-size:11px;color:var(--muted);line-height:1.5}
-.import-preview{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.6;max-height:120px;overflow-y:auto}
-.import-row-preview{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px}
-.import-row-preview:last-child{border-bottom:none}
-
+.step-num{font-family:var(--display);font-weight:900;font-size:22px;color:var(--accent);margin-bottom:2px}
+.step-title{font-size:13px;font-weight:600;margin-bottom:5px}
+.step-desc{font-size:11px;color:var(--muted);line-height:1.5}
+.import-preview{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:8px;max-height:120px;overflow-y:auto}
+.preview-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px}
+.preview-row:last-child{border-bottom:none}
 /* RUN SHEET */
-.trip-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
-.ts{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:10px 8px;text-align:center}
-.ts-val{font-family:var(--display);font-weight:900;font-size:22px;color:var(--accent)}
+.trip-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px}
+.ts{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:9px 6px;text-align:center}
+.ts-val{font-family:var(--display);font-weight:900;font-size:20px;color:var(--accent)}
 .ts-val.green{color:var(--green)}
 .ts-lbl{font-size:8px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:2px}
-.day-header{display:flex;align-items:center;gap:10px;margin:14px 0 8px}
-.day-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
-.day-title{font-family:var(--display);font-weight:900;font-size:20px;letter-spacing:1px}
-.day-sub{font-size:10px;color:var(--muted);margin-top:1px}
-.day-chips{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap}
-.day-chip{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;border:1px solid var(--border);color:var(--muted)}
+.day-filter{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.day-filter::-webkit-scrollbar{display:none}
+.df-btn{font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:1px;padding:6px 11px;border:1px solid var(--border);background:var(--s2);color:var(--muted);border-radius:5px;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.df-btn.on{background:var(--accent);border-color:var(--accent);color:#000}
+.day-header{display:flex;align-items:flex-start;gap:10px;margin:14px 0 7px}
+.day-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.day-title{font-family:var(--display);font-weight:900;font-size:18px;letter-spacing:1px}
+.day-meta{font-size:10px;color:var(--muted);margin-top:1px}
+.day-chips{display:flex;gap:5px;margin-top:3px;flex-wrap:wrap}
+.day-chip{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:3px;border:1px solid var(--border);color:var(--muted)}
 .day-chip.green{border-color:var(--green);color:var(--green)}
 .day-chip.accent{border-color:var(--accent);color:var(--accent)}
-.day-filter{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
-.day-filter::-webkit-scrollbar{display:none}
-.df-btn{font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:1px;padding:7px 12px;border:1px solid var(--border);background:var(--s2);color:var(--muted);border-radius:5px;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent}
-.df-btn.on{background:var(--accent);border-color:var(--accent);color:#000}
-
 /* VISIT CARDS */
-.visit-card{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;-webkit-tap-highlight-color:transparent;transition:all 0.15s}
-.visit-card.vc-planned{border-left-color:var(--border2)}
-.visit-card.vc-visited{border-left-color:var(--blue)}
-.visit-card.vc-follow{border-left-color:var(--accent)}
-.visit-card.vc-done{border-left-color:var(--green)}
-.visit-card.vc-tbc{border-left-color:var(--border);opacity:0.6}
-.vc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
-.vc-name{font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:0.5px}
-.vc-name.tbc{color:var(--muted)}
-.vc-value{font-family:var(--display);font-weight:900;font-size:16px;color:var(--accent)}
-.vc-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.visit-card{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;-webkit-tap-highlight-color:transparent}
+.vc-planned{border-left-color:var(--border2)}.vc-visited{border-left-color:var(--blue)}.vc-follow{border-left-color:var(--accent)}.vc-done{border-left-color:var(--green)}
+.vc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}
+.vc-name{font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:.5px;flex:1;padding-right:8px}
+.vc-value{font-family:var(--display);font-weight:900;font-size:15px;color:var(--accent);white-space:nowrap}
+.vc-row{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:4px}
 .vc-loc{font-size:11px;color:var(--muted)}
-.pill{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:0.5px;padding:2px 8px;border-radius:3px;border:1px solid var(--border)}
+.pill{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.5px;padding:2px 7px;border-radius:3px;border:1px solid var(--border)}
 .pill-planned{background:var(--s3);color:var(--muted)}
 .pill-visited{background:var(--blue-dim);border-color:var(--blue);color:var(--blue)}
 .pill-follow{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
 .pill-done{background:var(--green-dim);border-color:var(--green);color:var(--green)}
-.pill-tbc{background:var(--s3);color:var(--muted)}
 .pill-cat{background:var(--s3);color:var(--muted);font-size:9px}
-
 /* EXPANDED CARD */
-.card-expanded{border-top:1px solid var(--border);margin-top:10px;padding-top:10px}
+.card-exp{border-top:1px solid var(--border);margin-top:10px;padding-top:10px}
 .exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
 .exp-field label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px}
 .exp-field div{font-size:12px;color:var(--text)}
-.exp-prods{margin-bottom:10px}
-.exp-prod-row{font-size:11px;padding:4px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
-.exp-prod-row:last-child{border-bottom:none}
-.exp-actions{display:flex;gap:6px}
-
+.exp-actions{display:flex;gap:6px;margin-top:8px}
+/* MYOB HISTORY */
+.myob-block{background:var(--s2);border:1px solid var(--blue);border-left:3px solid var(--blue);border-radius:6px;padding:10px;margin-bottom:10px}
+.myob-title{font-family:var(--display);font-weight:800;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.myob-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px}
+.myob-row:last-child{border-bottom:none}
+.myob-cat{color:var(--muted)}
+.myob-amt{font-family:var(--display);font-weight:700;color:var(--green)}
+.myob-total-row{display:flex;justify-content:space-between;padding-top:6px;margin-top:2px;border-top:1px solid var(--border2)}
+.myob-total-lbl{font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1px}
+.myob-total-val{font-family:var(--display);font-weight:900;font-size:16px;color:var(--accent)}
+/* INLINE DAY EDIT */
+.day-edit-row{background:var(--s2);border:1px solid var(--border2);border-radius:6px;padding:8px 10px;margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.day-edit-row select,.day-edit-row input[type=date]{background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:5px 8px;font-family:var(--body);font-size:13px;outline:none;-webkit-appearance:none}
 /* LOG VISIT */
-.form-section{margin-bottom:16px}
-.form-section-title{font-family:var(--display);font-weight:900;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:10px}
-.inp-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.alert-inline{background:var(--red-dim);border:1px solid rgba(232,68,26,0.35);border-radius:5px;padding:6px 10px;font-size:11px;color:#f07060;margin-bottom:9px;display:flex;align-items:center;gap:5px}
+.form-section{margin-bottom:14px}
+.form-section-title{font-family:var(--display);font-weight:900;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);padding:7px 0;border-bottom:1px solid var(--border);margin-bottom:9px}
 .tog-row{display:flex;gap:6px}
-.tog{flex:1;padding:11px 4px;border:1px solid var(--border);background:var(--s2);color:var(--muted);font-family:var(--display);font-weight:700;font-size:13px;border-radius:5px;cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+.tog{flex:1;padding:10px 4px;border:1px solid var(--border);background:var(--s2);color:var(--muted);font-family:var(--display);font-weight:700;font-size:12px;border-radius:5px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
 .tog.t-y{background:var(--green-dim);border-color:var(--green);color:var(--green)}
 .tog.t-n{background:var(--red-dim);border-color:var(--red);color:var(--red)}
 .tog.t-h{background:var(--red-dim);border-color:var(--red);color:var(--red)}
@@ -163,163 +176,88 @@ textarea.inp{min-height:80px;resize:none;line-height:1.5;font-size:14px}
 .tog.t-l{background:var(--green-dim);border-color:var(--green);color:var(--green)}
 .prod-block{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px}
 .prod-block-title{font-family:var(--display);font-weight:800;font-size:12px;letter-spacing:1px;color:var(--accent);margin-bottom:10px}
-.sku-list{background:var(--bg);border:1px solid var(--border);border-radius:5px;margin-top:4px;max-height:180px;overflow-y:auto}
-.sku-item{padding:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--border);-webkit-tap-highlight-color:transparent}
+.sku-list{background:var(--bg);border:1px solid var(--border);border-radius:5px;margin-top:4px;max-height:160px;overflow-y:auto}
+.sku-item{padding:9px 10px;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--border);-webkit-tap-highlight-color:transparent}
 .sku-item:last-child{border-bottom:none}
 .sku-item:active{background:var(--accent-dim)}
 .sku-code{font-family:var(--mono);font-size:10px;color:var(--accent)}
 .sku-desc{font-size:11px;color:var(--text);margin-top:1px;line-height:1.3}
-.sku-price{font-family:var(--display);font-weight:700;font-size:14px;color:var(--green)}
+.sku-price{font-family:var(--display);font-weight:700;font-size:13px;color:var(--green)}
 .sku-gp{font-size:9px;color:var(--muted)}
 .sku-selected{background:var(--s3);border:1px solid var(--green);border-radius:5px;padding:8px 10px;margin-top:4px;display:flex;justify-content:space-between;align-items:center}
-.sku-clear{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px 8px;-webkit-tap-highlight-color:transparent}
-.live-calc{background:linear-gradient(135deg,rgba(45,216,122,0.08),rgba(75,156,245,0.06));border:1px solid rgba(45,216,122,0.25);border-radius:5px;padding:10px 12px;margin-top:8px}
+.sku-clear{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px 8px}
+.live-calc{background:linear-gradient(135deg,rgba(45,216,122,.08),rgba(75,156,245,.06));border:1px solid rgba(45,216,122,.25);border-radius:5px;padding:9px 12px;margin-top:8px}
 .lc-row{display:flex;justify-content:space-between;align-items:center}
 .lc-label{font-size:11px;color:var(--muted)}
-.lc-val{font-family:var(--display);font-weight:700;font-size:15px;color:var(--green)}
-.add-prod{width:100%;background:transparent;border:1px dashed var(--border2);border-radius:6px;padding:11px;color:var(--muted);font-family:var(--body);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;margin-bottom:12px;-webkit-tap-highlight-color:transparent}
-.btn{width:100%;padding:14px;border:none;border-radius:6px;font-family:var(--display);font-weight:800;font-size:14px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;margin-bottom:8px;-webkit-tap-highlight-color:transparent}
-.btn-accent{background:var(--accent);color:#000}
-.btn-fire{background:linear-gradient(135deg,#c73812,#f5a623);color:#fff}
-.btn-ghost{background:var(--s2);border:1px solid var(--border);color:var(--text)}
-.btn-green{background:var(--green);color:#000}
-.btn-red{background:var(--red-dim);border:1px solid var(--red);color:var(--red)}
+.lc-val{font-family:var(--display);font-weight:700;font-size:14px;color:var(--green)}
+.add-prod{width:100%;background:transparent;border:1px dashed var(--border2);border-radius:6px;padding:10px;color:var(--muted);font-family:var(--body);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px}
 .search-box{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;color:var(--text);font-family:var(--body);font-size:16px;outline:none;margin-bottom:12px;-webkit-appearance:none}
 .search-box:focus{border-color:var(--accent)}
 .search-box::placeholder{color:var(--muted)}
-
+.copy-ok{color:var(--green);font-size:11px;font-weight:600;text-align:center;margin-top:3px;margin-bottom:6px}
 /* OUTPUT */
-.out-hero{background:linear-gradient(135deg,var(--s2),var(--s1));border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
-.out-account{font-family:var(--display);font-weight:900;font-size:20px;letter-spacing:1px;margin-bottom:10px}
+.out-hero{background:linear-gradient(135deg,var(--s2),var(--s1));border:1px solid var(--border);border-radius:10px;padding:15px;margin-bottom:12px}
+.out-account{font-family:var(--display);font-weight:900;font-size:20px;letter-spacing:1px;margin-bottom:8px}
 .out-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.out-val{font-family:var(--display);font-weight:900;font-size:30px;line-height:1}
-.out-val.green{color:var(--green)}
-.out-val.accent{color:var(--accent)}
+.out-val{font-family:var(--display);font-weight:900;font-size:28px;line-height:1}
+.out-val.green{color:var(--green)}.out-val.accent{color:var(--accent)}
 .out-lbl{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:2px}
-.rank-chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--display);font-weight:900;font-size:15px;padding:5px 11px;border-radius:5px;margin-top:10px}
+.rank-chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--display);font-weight:900;font-size:14px;padding:4px 10px;border-radius:5px;margin-top:8px}
 .rank-A{background:var(--green-dim);border:1px solid var(--green);color:var(--green)}
 .rank-B{background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent)}
 .rank-C{background:var(--s3);border:1px solid var(--border2);color:var(--muted)}
-.out-block{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:13px;margin-bottom:9px}
+.out-block{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:12px;margin-bottom:9px}
 .out-block pre{font-family:var(--mono);font-size:10px;color:var(--muted);white-space:pre-wrap;line-height:1.7}
-.prod-out-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border)}
+.prod-out-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border)}
 .prod-out-row:last-child{border-bottom:none}
-.por-name{font-size:13px;font-weight:600}
-.por-sku{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
-.por-pain{font-size:11px;color:var(--accent);margin-top:3px}
-.por-price{font-family:var(--display);font-weight:700;font-size:16px;color:var(--green)}
+.por-name{font-size:12px;font-weight:600}
+.por-sku{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:1px}
+.por-price{font-family:var(--display);font-weight:700;font-size:15px;color:var(--green)}
 .por-ann{font-size:10px;color:var(--muted)}
-.copy-ok{color:var(--green);font-size:11px;font-weight:600;text-align:center;margin-top:3px;margin-bottom:6px}
-
 /* CATALOGUE */
-.cat-section{margin-bottom:18px}
-.cat-section-title{font-family:var(--display);font-weight:900;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);padding:6px 0;border-bottom:1px solid var(--border);margin-bottom:8px}
-.cat-row{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 4px;border-bottom:1px solid var(--border);cursor:pointer;-webkit-tap-highlight-color:transparent}
-.cat-row:active{background:var(--s2)}
-.cat-row:last-child{border-bottom:none}
-.cat-sku{font-family:var(--mono);font-size:10px;color:var(--accent);min-width:80px}
-.cat-name{font-size:12px;color:var(--text);flex:1;padding:0 8px;line-height:1.3}
-.cat-price{font-family:var(--display);font-weight:700;font-size:14px;color:var(--green);white-space:nowrap;text-align:right}
+.cat-section{margin-bottom:16px}
+.cat-section-title{font-family:var(--display);font-weight:900;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);padding:5px 0;border-bottom:1px solid var(--border);margin-bottom:7px}
+.cat-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 4px;border-bottom:1px solid var(--border);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cat-row:active{background:var(--s2)}.cat-row:last-child{border-bottom:none}
+.cat-sku{font-family:var(--mono);font-size:10px;color:var(--accent);min-width:75px}
+.cat-name{font-size:11px;color:var(--text);flex:1;padding:0 8px;line-height:1.3}
+.cat-price{font-family:var(--display);font-weight:700;font-size:13px;color:var(--green);white-space:nowrap;text-align:right}
 .cat-unit{font-size:9px;color:var(--muted)}
-
 /* NOTES */
-.note-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px}
-.note-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.note-account-name{font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:1px}
+.note-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:13px;margin-bottom:11px}
+.note-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.note-account-name{font-family:var(--display);font-weight:800;font-size:14px;letter-spacing:1px}
 .note-time{font-family:var(--mono);font-size:9px;color:var(--muted)}
-.note-raw{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px;font-style:italic;border-left:2px solid var(--border2);padding-left:10px}
-.note-summary{font-size:13px;color:var(--text);line-height:1.6}
-.note-summary-label{font-family:var(--display);font-weight:800;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
-.record-btn{width:100%;padding:18px;border:none;border-radius:10px;font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:10px;-webkit-tap-highlight-color:transparent;transition:all 0.15s}
+.note-raw{font-size:12px;color:var(--muted);line-height:1.5;font-style:italic;border-left:2px solid var(--border2);padding-left:10px}
+.note-summary{font-size:12px;color:var(--text);line-height:1.6}
+.note-summary-label{font-family:var(--display);font-weight:800;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:5px}
+.record-btn{width:100%;padding:16px;border:none;border-radius:10px;font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:10px;-webkit-tap-highlight-color:transparent}
 .record-btn.idle{background:var(--s2);border:2px dashed var(--border2);color:var(--muted)}
 .record-btn.recording{background:var(--red-dim);border:2px solid var(--red);color:var(--red);animation:pulse 1.2s infinite}
-.record-btn.transcribing{background:var(--blue-dim);border:2px solid var(--blue);color:var(--blue);animation:pulse 1.2s infinite}
-.record-btn.processing{background:var(--accent-dim);border:2px solid var(--accent);color:var(--accent);animation:pulse 1.2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
-.del-note{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 6px;-webkit-tap-highlight-color:transparent}
-.del-note:active{color:var(--red)}
-.empty-notes{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;line-height:1.6}
-.empty-notes .big{font-size:36px;margin-bottom:10px}
-
-/* SAVE BANNER */
-.save-banner{background:var(--green-dim);border:1px solid var(--green);border-radius:5px;padding:6px 12px;font-size:11px;color:var(--green);text-align:center;margin-bottom:12px;font-weight:600}
-.fab{position:fixed;bottom:max(20px,env(safe-area-inset-bottom,20px));right:16px;width:54px;height:54px;background:var(--accent);border:none;border-radius:50%;font-size:24px;cursor:pointer;box-shadow:0 4px 20px rgba(245,166,35,0.4);display:flex;align-items:center;justify-content:center;z-index:200;-webkit-tap-highlight-color:transparent}
-
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;display:flex;align-items:flex-end}
-.modal{background:var(--s1);border-radius:16px 16px 0 0;padding:20px;padding-bottom:max(20px,env(safe-area-inset-bottom,20px));width:100%;max-height:85vh;overflow-y:auto}
-.modal-title{font-family:var(--display);font-weight:900;font-size:18px;letter-spacing:1px;margin-bottom:4px}
-.modal-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
-
+.record-btn.transcribing,.record-btn.processing{background:var(--accent-dim);border:2px solid var(--accent);color:var(--accent);animation:pulse 1.2s infinite}
+.del-note{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 6px}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;line-height:1.6}
+.empty-state .big{font-size:36px;margin-bottom:10px}
+/* EXPORT */
+.export-card{background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:14px;margin-bottom:14px}
+.export-card-title{font-family:var(--display);font-weight:900;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.export-card-desc{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px}
 /* LOADING */
 .loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;background:var(--bg)}
-.loading-logo{font-family:var(--display);font-weight:900;font-size:48px;letter-spacing:4px;color:var(--accent)}
 .loading-sub{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:2px;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 </style>
 </head>
 <body>
 <div id="root"></div>
-
-<!-- Firebase Compat SDK (works on all browsers / GitHub Pages) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script>
-(function() {
-  try {
-    const firebaseConfig = {
-      apiKey: "AIzaSyChsz_uG6d2I1eIMpwjJWikCVMuLevnW2A",
-      authDomain: "xpak-field-sales.firebaseapp.com",
-      projectId: "xpak-field-sales",
-      storageBucket: "xpak-field-sales.firebasestorage.app",
-      messagingSenderId: "1081261518456",
-      appId: "1:1081261518456:web:9852b74954f3b81376478d"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    window.FB = {
-      saveTrips: async (trips) => {
-        await db.collection("xpak").doc("trips").set({ trips, updatedAt: Date.now() });
-      },
-      loadTrips: async () => {
-        const snap = await db.collection("xpak").doc("trips").get();
-        return snap.exists ? snap.data().trips : [];
-      },
-      saveVisits: async (tripId, visits) => {
-        await db.collection("xpak_visits").doc(tripId).set({ visits, updatedAt: Date.now() });
-      },
-      loadVisits: async (tripId) => {
-        const snap = await db.collection("xpak_visits").doc(tripId).get();
-        return snap.exists ? snap.data().visits : [];
-      },
-      saveNotes: async (tripId, notes) => {
-        await db.collection("xpak_notes").doc(tripId).set({ notes, updatedAt: Date.now() });
-      },
-      loadNotes: async (tripId) => {
-        const snap = await db.collection("xpak_notes").doc(tripId).get();
-        return snap.exists ? snap.data().notes : [];
-      },
-    };
-
-    window.FB_READY = true;
-    window.dispatchEvent(new Event("fb-ready"));
-  } catch(e) {
-    console.warn("Firebase init failed:", e);
-    window.FB_READY = false;
-    window.dispatchEvent(new Event("fb-ready"));
-  }
-})();
-</script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <script type="text/babel">
-const {useState, useEffect, useRef, useCallback} = React;
+const {useState,useEffect,useRef,useCallback}=React;
 
-// ─── PRICELIST ────────────────────────────────────────────────────────────────
-const PRICELIST = [
+// ═══ PRICELIST ════════════════════════════════════════════════════════════════
+const PRICELIST=[
   {sku:"10.005",desc:"X-Pak Woven Dunnage Bag 90x120cm (40/ctn)",cat:"Dunnage Bags",unit:"Each",price:10.57,cost:3.95,gp:60},
   {sku:"10.005P",desc:"X-Pak Woven Dunnage Bag 90x120cm Level 0 (800/Pallet)",cat:"Dunnage Bags",unit:"Each",price:9.63,cost:3.15,gp:65},
   {sku:"10.005P-1",desc:"X-Pak Woven Dunnage Bag 90x120cm Level 1 (725/Pallet)",cat:"Dunnage Bags",unit:"Each",price:11.65,cost:3.81,gp:65},
@@ -336,8 +274,8 @@ const PRICELIST = [
   {sku:"10.025P-2",desc:"X-Pak Woven Dunnage Bag 120x240cm Level 2 (190/pallet)",cat:"Dunnage Bags",unit:"Each",price:35.78,cost:15.05,gp:55},
   {sku:"10.040",desc:"X-Pak Woven Dunnage Bag 130x120cm Level 1 (500/Pallet)",cat:"Dunnage Bags",unit:"Each",price:11.65,cost:4.9,gp:55},
   {sku:"10.050",desc:"X-Pak Woven Dunnage Bag 150x240cm Level 1 (300/Pallet)",cat:"Dunnage Bags",unit:"Each",price:21.19,cost:9.9,gp:50},
-  {sku:"10.210",desc:"Container Door Tarp w/ restraint lashing 2250x2250cm (15/ctn)",cat:"Dunnage Bags",unit:"Each",price:36.81,cost:17.2,gp:50},
-  {sku:"10.220",desc:"Inflatable Container Door Tarp w/ restraint lashing 2000x2300cm",cat:"Dunnage Bags",unit:"Each",price:91.84,cost:51.5,gp:40},
+  {sku:"10.210",desc:"Container Door Tarp w/ restraint lashing (15/ctn)",cat:"Dunnage Bags",unit:"Each",price:36.81,cost:17.2,gp:50},
+  {sku:"10.220",desc:"Inflatable Container Door Tarp w/ restraint lashing",cat:"Dunnage Bags",unit:"Each",price:91.84,cost:51.5,gp:40},
   {sku:"10.300",desc:"Inflate-X Pro Unit 2x Batteries 1x Charger",cat:"Dunnage Bags",unit:"Each",price:866.7,cost:405.0,gp:50},
   {sku:"10.301",desc:"Inflate-X Pro Single Battery",cat:"Dunnage Bags",unit:"Each",price:304.35,cost:128.0,gp:55},
   {sku:"10.302",desc:"Inflate-X Pro Single Charger",cat:"Dunnage Bags",unit:"Each",price:93.62,cost:35.0,gp:60},
@@ -365,8 +303,7 @@ const PRICELIST = [
   {sku:"03.067",desc:"X-Pak Strapping Tensioner Up to 25mm",cat:"Woven/PET Strapping",unit:"Each",price:297.46,cost:152.9,gp:45},
   {sku:"03.068",desc:"Milwaukee Battery Lashing Tensioner 2 batteries 1x Charger",cat:"Woven/PET Strapping",unit:"Each",price:5885.0,cost:3300.0,gp:40},
   {sku:"03.068Z",desc:"Zapak CT32 Battery Strapping Tensioner up to 32mm",cat:"Woven/PET Strapping",unit:"Each",price:4859.59,cost:2725.0,gp:40},
-  {sku:"03.101",desc:"H/Duty Dispenser Cart Suits Rope Steel PET",cat:"Woven/PET Strapping",unit:"Each",price:411.54,cost:250.0,gp:35},
-  {sku:"03.009-19",desc:"KRONOS PET Battery Strapping Tool Charger 1 Battery 19mm",cat:"Woven/PET Strapping",unit:"Each",price:3974.29,cost:2600.0,gp:30},
+  {sku:"03.009-19",desc:"KRONOS PET Battery Strapping Tool 19mm",cat:"Woven/PET Strapping",unit:"Each",price:3974.29,cost:2600.0,gp:30},
   {sku:"03.009B",desc:"Spare battery to suit Kronos Battery tool",cat:"Woven/PET Strapping",unit:"Each",price:275.14,cost:180.0,gp:30},
   {sku:"03.111",desc:"PET Strapping 16mm x 0.9mm x 1200m Green Embossed",cat:"Woven/PET Strapping",unit:"Roll",price:77.19,cost:50.5,gp:30},
   {sku:"03.112",desc:"PET Strapping 19mm x 1.0mm x 1000m Green Embossed",cat:"Woven/PET Strapping",unit:"Roll",price:84.07,cost:55.0,gp:30},
@@ -390,7 +327,7 @@ const PRICELIST = [
   {sku:"02.074",desc:"Heat Shrink Tubing 1220+1220 x 100um x 30Kg CLEAR",cat:"Pallet Films",unit:"Roll",price:148.63,cost:97.24,gp:30},
   {sku:"02.075",desc:"Heat Shrink Tubing 1220+1220 x 150um x 30Kg CLEAR",cat:"Pallet Films",unit:"Roll",price:148.63,cost:97.24,gp:30},
   {sku:"02.080",desc:"Cardboard Pallet Pads 1160x1160x4mm thick",cat:"Pallet Films",unit:"Each",price:1.99,cost:1.3,gp:30},
-  {sku:"02.081",desc:"Kraft Heavy Liner Sheets 1165x1165x190GSM 2000/Pallet",cat:"Pallet Films",unit:"1000",price:657.29,cost:430.0,gp:30},
+  {sku:"02.081",desc:"Kraft Heavy Liner Sheets 1165x1165x190GSM",cat:"Pallet Films",unit:"1000",price:657.29,cost:430.0,gp:30},
   {sku:"02.0847",desc:"Plastic Slip Sheet 1250x1100x0.7mm",cat:"Pallet Films",unit:"Each",price:3.83,cost:2.15,gp:40},
   {sku:"03.150",desc:"Cargo-Lash 32mm x 250m",cat:"Lashing",unit:"Roll",price:141.24,cost:66.0,gp:50},
   {sku:"03.155",desc:"Cargo-Lash 40mm x 200m",cat:"Lashing",unit:"Roll",price:188.75,cost:88.2,gp:50},
@@ -407,19 +344,19 @@ const PRICELIST = [
   {sku:"12.800",desc:"Hanger Tool for Pak-Dry Desiccant",cat:"Desiccants",unit:"Each",price:40.12,cost:15.0,gp:60},
   {sku:"03.205",desc:"Magnet with Loop 41kg Adhesive Force",cat:"Truck Restraint",unit:"Each",price:40.12,cost:15.0,gp:60},
   {sku:"03.206",desc:"Red Lash Installation Tool",cat:"Truck Restraint",unit:"Each",price:254.13,cost:95.0,gp:60},
-  {sku:"03.212",desc:"Load-Lash Essential w/ 2x horizontal straps 1 set",cat:"Truck Restraint",unit:"Set",price:64.2,cost:24.0,gp:60},
+  {sku:"03.212",desc:"Load-Lash Essential w/ 2x horizontal straps",cat:"Truck Restraint",unit:"Set",price:64.2,cost:24.0,gp:60},
   {sku:"03.222",desc:"Load-Lash Pro w/ 2x horizontal straps",cat:"Truck Restraint",unit:"Set",price:84.16,cost:31.46,gp:60},
   {sku:"03.224",desc:"Load-Lash Pro w/ 4x horizontal straps",cat:"Truck Restraint",unit:"Set",price:100.05,cost:37.4,gp:60},
   {sku:"03.280",desc:"Anti-Slip Matting 150x800x4mm",cat:"Truck Restraint",unit:"Each",price:5.7,cost:3.2,gp:40},
-  {sku:"03.290",desc:"Edge Protection Quarter Shell 1000mm x 200mm x 15mm HD",cat:"Truck Restraint",unit:"Each",price:21.31,cost:11.95,gp:40},
-  {sku:"03.295",desc:"Edge Protection Corner 1200x150x150x9mm w 4 cutouts",cat:"Truck Restraint",unit:"Each",price:19.17,cost:10.75,gp:40},
+  {sku:"03.290",desc:"Edge Protection Quarter Shell 1000mm HD",cat:"Truck Restraint",unit:"Each",price:21.31,cost:11.95,gp:40},
+  {sku:"03.295",desc:"Edge Protection Corner 1200x150x150x9mm",cat:"Truck Restraint",unit:"Each",price:19.17,cost:10.75,gp:40},
   {sku:"13.100",desc:"X-Pak RatStrap Pro",cat:"Truck Restraint",unit:"Each",price:899.77,cost:555.0,gp:34},
   {sku:"13.210",desc:"X-Pak ProPole Mounting Brackets",cat:"Truck Restraint",unit:"Each",price:171.2,cost:88.0,gp:45},
   {sku:"13.310",desc:"X-Pak ProPole Standard 1.2m-2.4m",cat:"Truck Restraint",unit:"Each",price:138.17,cost:29.7,gp:77},
   {sku:"13.320",desc:"X-Pak ProPole Extra Long 1.8m-3.6m",cat:"Truck Restraint",unit:"Each",price:189.84,cost:55.0,gp:69},
   {sku:"13.400",desc:"X-Pak ProHook Strap Positioning Tool",cat:"Truck Restraint",unit:"Each",price:83.22,cost:42.78,gp:45},
   {sku:"13.401",desc:"X-Pak ProSwivel",cat:"Truck Restraint",unit:"Each",price:74.24,cost:38.16,gp:45},
-  {sku:"13.402",desc:"X-Pak ProMulti Edge Protection Positioning Tool",cat:"Truck Restraint",unit:"Each",price:83.33,cost:38.16,gp:51},
+  {sku:"13.402",desc:"X-Pak ProMulti Edge Protection Tool",cat:"Truck Restraint",unit:"Each",price:83.33,cost:38.16,gp:51},
   {sku:"13.403",desc:"X-Pak ProMeasure Height Measuring Stick",cat:"Truck Restraint",unit:"Each",price:545.7,cost:280.5,gp:45},
   {sku:"13.404",desc:"X-Pak ProLauncher Strap Launching Device",cat:"Truck Restraint",unit:"Each",price:136.18,cost:70.0,gp:45},
   {sku:"13.405",desc:"X-Pak ProSlider Strap Sleeve Positioner",cat:"Truck Restraint",unit:"Each",price:74.2,cost:38.14,gp:45},
@@ -434,944 +371,912 @@ const PRICELIST = [
   {sku:"13.600",desc:"CargoChock Wheel Chock",cat:"Truck Restraint",unit:"Each",price:46.93,cost:25.0,gp:43},
   {sku:"13.601",desc:"CargoChock Wheel Chock Holder",cat:"Truck Restraint",unit:"Each",price:32.65,cost:18.0,gp:41},
   {sku:"13.610",desc:"Trok Pallet Truck Holder",cat:"Truck Restraint",unit:"Each",price:68.79,cost:36.0,gp:44},
-  {sku:"14.100",desc:"X-Pak Ratchet Strap 50mm x 9m Hook and Keeper 2500kg",cat:"Truck Restraint",unit:"Each",price:16.82,cost:9.43,gp:40},
-  {sku:"14.110",desc:"X-Pak Ratchet Strap 50mm x 11m Hook and Keeper 2500kg",cat:"Truck Restraint",unit:"Each",price:18.22,cost:10.22,gp:40},
-  {sku:"14.200",desc:"X-Pak Ratchet Strap 50mm x 9m J hook 2500kg",cat:"Truck Restraint",unit:"Each",price:13.91,cost:7.8,gp:40},
-  {sku:"14.300",desc:"X-Pak Pulldown Ratchet Strap 50mm x 9m Hook and Keeper 2500kg",cat:"Truck Restraint",unit:"Each",price:20.07,cost:10.32,gp:45},
-  {sku:"14.310",desc:"X-Pak Pulldown Ratchet Strap 50mm x 11m Hook and Keeper 2500kg",cat:"Truck Restraint",unit:"Each",price:21.52,cost:11.06,gp:45},
+  {sku:"14.100",desc:"X-Pak Ratchet Strap 50mm x 9m Hook and Keeper",cat:"Truck Restraint",unit:"Each",price:16.82,cost:9.43,gp:40},
+  {sku:"14.110",desc:"X-Pak Ratchet Strap 50mm x 11m Hook and Keeper",cat:"Truck Restraint",unit:"Each",price:18.22,cost:10.22,gp:40},
+  {sku:"14.200",desc:"X-Pak Ratchet Strap 50mm x 9m J hook",cat:"Truck Restraint",unit:"Each",price:13.91,cost:7.8,gp:40},
+  {sku:"14.300",desc:"X-Pak Pulldown Ratchet Strap 50mm x 9m",cat:"Truck Restraint",unit:"Each",price:20.07,cost:10.32,gp:45},
+  {sku:"14.310",desc:"X-Pak Pulldown Ratchet Strap 50mm x 11m",cat:"Truck Restraint",unit:"Each",price:21.52,cost:11.06,gp:45},
   {sku:"15.200",desc:"X-Pak Single Strap Edge Protector HD Black",cat:"Truck Restraint",unit:"Each",price:2.62,cost:1.35,gp:45},
   {sku:"15.300",desc:"X-Pak Heavy Edge Protector 800mm Yellow",cat:"Truck Restraint",unit:"Each",price:9.79,cost:5.03,gp:45},
   {sku:"15.400",desc:"X-Pak Heavy Edge Protector 1150mm Yellow",cat:"Truck Restraint",unit:"Each",price:15.55,cost:7.99,gp:45},
-  {sku:"01.001",desc:"E-Tape No.1 50mm x 150m Clear",cat:"Tape",unit:"Roll",price:6.09,cost:3.7,gp:35}
+  {sku:"01.001",desc:"E-Tape No.1 50mm x 150m Clear",cat:"Tape",unit:"Roll",price:6.09,cost:3.7,gp:35},
 ];
 
-const CATEGORIES = ["Dunnage Bags","Woven/PET Strapping","Machine Wrap","Hand Wrap","Pallet Films","Lashing","Corner Protection","Desiccants","Truck Restraint","Tape","Other"];
-const CAT_MAP = {
-  "Dunnage Bags":["Dunnage Bags"],"Woven/PET Strapping":["Woven/PET Strapping"],
-  "Machine Wrap":["Machine Wrap"],"Hand Wrap":["Hand Wrap"],"Pallet Films":["Pallet Films"],
-  "Lashing":["Lashing"],"Corner Protection":["Corner Protection"],"Desiccants":["Desiccants"],
-  "Truck Restraint":["Truck Restraint"],"Tape":["Tape"],"Other":[],
+const CATEGORIES=["Dunnage Bags","Woven/PET Strapping","Machine Wrap","Hand Wrap","Pallet Films","Lashing","Corner Protection","Desiccants","Truck Restraint","Tape"];
+const DAY_ORDER=["MON","TUE","WED","THU","FRI","SAT","SUN"];
+const DAY_COLORS={MON:"#4b9cf5",TUE:"#f5a623",WED:"#e8441a",THU:"#2dd87a",FRI:"#b94bf5",SAT:"#f54b9c",SUN:"#f5e642"};
+
+// SF PICKLISTS
+const SF_ACCOUNT_STATUS=["Buying","Unqualified","No Potential","Future Potential","Reseller","Supplier"];
+const SF_INDUSTRY=["Construction - Bricks/Pavers","Construction - Frame & Truss","Construction - Glass","Construction - Materials","Construction - Scaffold/Formwork","Cotton Gin","Food & Bev - Animals/Grain","Food & Bev - Beverages/Wine","Food & Bev - Fruit/Nut/Veggie","Food & Bev - Manufacturer","Hay Export","Influencer","Logistics - 3PL/Warehouse","Logistics - General","Logistics - Projects/Packer","Manufacturing - Other","Manufacturing - Paper","Mining & Chemicals","Pharma/Healthcare","Steel - Engineering/Fabrication","Steel - Heavy Equipment","Steel - Parts/Attachments","Steel - Supply/Manufacturer","Timber - General & Hardware","Timber - Sawmill/Manufacturer","Other"];
+const SF_SUPPLIERS=["Azapak","Cargo Restraint Systems","Cyklop","Fromm Packaging Aust.","Gateway Packaging","Hunter Industrial Supplies","JMP","OEMServ/Chelton","Omni Group","Opal","Power Packaging","Powerpak","Prime Packaging","Protection Experts","Samuel","Signet","Signode","Silverback","Strap & Wrap","Strap & Wrap - DY","Terry Phelps - DY","Tigerpak","Titan","Westside Packaging"];
+const SF_TRANSPORT=["Containers","Flatbed/Curtainsider","Rail","Refrigerated","Rigid","Road Train","Sea Freight","Other"];
+const SF_VISIT_FREQ=["Weekly","Fortnightly","Monthly","2 Months","3 Months","6 Months","Annually","As Required"];
+
+// ═══ HELPERS ══════════════════════════════════════════════════════════════════
+const fmt=n=>n?.toLocaleString("en-AU",{minimumFractionDigits:0,maximumFractionDigits:0})||"0";
+const fmtK=n=>n>=1000?`$${Math.round(n/1000)}k`:`$${fmt(n)}`;
+const annualise=(n,unit)=>{if(!n||isNaN(n))return 0;if(unit.includes("week"))return Math.round(n*52);if(unit.includes("month"))return Math.round(n*12);return Math.round(n);};
+const getrank=eas=>eas>=100000?"A":eas>=20000?"B":"C";
+const todayStr=()=>new Date().toLocaleDateString("en-AU",{day:"2-digit",month:"2-digit",year:"numeric"});
+const newProd=()=>({id:Date.now()+Math.random(),formCat:"",selectedSKU:null,usageRate:"",usageUnit:"rolls/week",painPoint:""});
+const newForm=(v={})=>({visitId:v.id||null,accountName:v.name||"",location:v.location||"",industry:v.industry||"",accountStatus:"Buying",decisionMaker:"",influencer:"",procurement:"",currentSupplier:"",existingSupplier:"",modeOfTransport:"",visitFrequency:"",keyNotes:"",products:[newProd()],trialAgreed:null,quoteRequired:null,urgency:null,followUpDate:""});
+
+const S={
+  get:(k,def=null)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}},
+  set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}},
 };
 
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
-const fmt = (n) => n?.toLocaleString("en-AU",{minimumFractionDigits:0,maximumFractionDigits:0})||"0";
-const fmtK = (n) => n>=1000 ? `$${Math.round(n/1000)}k` : `$${fmt(n)}`;
-const annualise = (n,unit) => {
-  if(!n||isNaN(n)) return 0;
-  if(unit==="rolls/week"||unit==="bags/week"||unit==="units/week") return Math.round(n*52);
-  if(unit==="rolls/month"||unit==="bags/month"||unit==="units/month") return Math.round(n*12);
-  if(unit==="pallets/month") return Math.round(n*12);
-  return Math.round(n);
-};
-const getrank = (eas) => eas>=100000?"A":eas>=30000?"B":"C";
-const newProd = () => ({id:Date.now()+Math.random(),formCat:"",selectedSKU:null,usageRate:"",usageUnit:"rolls/week",supplier:"",painPoint:""});
-const newForm = (v={}) => ({
-  visitId:v.id||null,accountName:v.name||"",location:v.location||"",
-  decisionMaker:"",influencer:"",procurement:"",owner:"",currentSupplier:"",
-  products:[newProd()],trialAgreed:null,quoteRequired:null,urgency:null,followUpDate:"",
-});
+// ═══ MYOB PARSER ══════════════════════════════════════════════════════════════
+function parseMYOB(text){
+  const SKIP=["XPAKLOL","CATALOGUE",""];
+  const lines=text.split(/\r?\n/);
+  const customers={};
+  let cur=null;
+  for(const line of lines){
+    const t=line.trim();if(!t)continue;
+    // Customer Total
+    const totM=t.match(/^,+(.+?) Total:,?"?([\d,\.]+)"?/);
+    if(totM){const n=totM[1].trim();if(customers[n])customers[n].total=parseFloat(totM[2].replace(/,/g,""))||0;cur=null;continue;}
+    // Customer header
+    const hdrM=t.match(/^([^,]+),(XC\d+|\*None)$/);
+    if(hdrM){const n=hdrM[1].trim();if(!customers[n])customers[n]={total:0,byCategory:{},lines:[]};cur=n;continue;}
+    // Transaction line (starts with an 8-digit invoice number or date-like number)
+    if(cur&&t.match(/^\d{6,8},/)){
+      const parts=[];let inQ=false,c="";
+      for(const ch of t){if(ch==='"'){inQ=!inQ;}else if(ch===','&&!inQ){parts.push(c);c="";}else c+=ch;}
+      parts.push(c);
+      if(parts.length>=7){
+        const sku=(parts[3]||"").trim();
+        if(SKIP.includes(sku.toUpperCase()))continue;
+        const amount=parseFloat((parts[6]||"0").replace(/,/g,""))||0;
+        if(amount<=0)continue;
+        let cat="Other";
+        const skuL=sku.toLowerCase();
+        for(const p of PRICELIST){if(p.sku.toLowerCase()===skuL){cat=p.cat;break;}}
+        if(cat==="Other"){for(const p of PRICELIST){if(p.sku.toLowerCase().startsWith(skuL.substring(0,4))){cat=p.cat;break;}}}
+        customers[cur].byCategory[cat]=(customers[cur].byCategory[cat]||0)+amount;
+        customers[cur].lines.push({sku,desc:parts[4],amount,cat});
+      }
+    }
+  }
+  return customers;
+}
 
-// ─── LOCAL STORAGE FALLBACK ───────────────────────────────────────────────────
-const S = {
-  get:(k,def=null)=>{ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):def; }catch(e){ return def; }},
-  set:(k,v)=>{ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} },
-};
-
-// ─── SF CSV PARSER ────────────────────────────────────────────────────────────
-function parseSFCSV(text) {
-  const lines = text.trim().split('\n');
-  if(lines.length < 2) return [];
-  const headers = lines[0].split(',').map(h=>h.replace(/"/g,'').trim());
-  const nameIdx = headers.findIndex(h=>h.toLowerCase().includes('account name')||h.toLowerCase()==='name');
-  const cityIdx = headers.findIndex(h=>h.toLowerCase().includes('city')||h.toLowerCase().includes('location'));
-  const industryIdx = headers.findIndex(h=>h.toLowerCase().includes('industry')||h.toLowerCase().includes('category'));
-  const accounts = [];
+// ═══ SF CSV PARSER ════════════════════════════════════════════════════════════
+function parseSFCSV(text){
+  const lines=text.trim().split('\n');if(lines.length<2)return[];
+  const headers=lines[0].split(',').map(h=>h.replace(/"/g,'').trim());
+  const nameIdx=headers.findIndex(h=>h.toLowerCase().includes('account name')||h.toLowerCase()==='name');
+  const cityIdx=headers.findIndex(h=>h.toLowerCase().includes('city')||h.toLowerCase().includes('location')||h.toLowerCase().includes('shipping'));
+  const industryIdx=headers.findIndex(h=>h.toLowerCase().includes('industry')||h.toLowerCase().includes('category'));
+  const accounts=[];
   for(let i=1;i<lines.length;i++){
-    const cols = lines[i].match(/(".*?"|[^,]+)(?=,|$)/g)||[];
-    const clean = cols.map(c=>c.replace(/^"|"$/g,'').trim());
-    const name = clean[nameIdx]||"";
-    if(!name) continue;
-    accounts.push({
-      id: Date.now()+Math.random()+i,
-      name, location: clean[cityIdx]||"", category: clean[industryIdx]||"",
-      status: "planned", eas: 0, day: "", date: "", visitDetail: null, isTBC: false,
-    });
+    const cols=lines[i].match(/(".*?"|[^,]+)(?=,|$)/g)||[];
+    const clean=cols.map(c=>c.replace(/^"|"$/g,'').trim());
+    const name=nameIdx>=0?clean[nameIdx]:"";if(!name)continue;
+    accounts.push({id:Date.now()+Math.random()+i,name,location:cityIdx>=0?clean[cityIdx]:"",category:industryIdx>=0?clean[industryIdx]:"",status:"planned",eas:0,day:"",date:"",sortOrder:i,visitDetail:null,myobHistory:null});
   }
   return accounts;
 }
 
-// ─── APP ──────────────────────────────────────────────────────────────────────
-function App() {
-  const [fbReady, setFbReady] = useState(window.FB_READY||false);
-  const [syncStatus, setSyncStatus] = useState("syncing"); // ok | syncing | err | offline
-  const [syncMsg, setSyncMsg] = useState("Connecting…");
+// ═══ SF EXPORT CSV ════════════════════════════════════════════════════════════
+function generateSFExport(visits,tripName){
+  const visited=visits.filter(v=>v.visitDetail&&["visited","done","follow"].includes(v.status));
+  if(!visited.length)return null;
+  const csv=val=>`"${String(val).replace(/"/g,'""')}"`;
+  // Accounts sheet
+  const accH=["Account Name","Account Status","EST Annual $","EST Annual GP $","Primary Product","Last Contact Date","Next Contact Date","Visit Frequency","Key notes","Existing Supplier (SF)","Mode of Transport"].map(csv).join(",");
+  const accR=visited.map(v=>{
+    const d=v.visitDetail;
+    const annGP=d.totalEAS?Math.round(d.totalEAS*(d.avgGP||40)/100):0;
+    const topCat=d.prods?.find(p=>p.selectedSKU)?.selectedSKU?.cat||"";
+    return[v.name,d.accountStatus||"Buying",d.totalEAS?Math.round(d.totalEAS):"",annGP||"",topCat,todayStr(),d.followUpDate||"",d.visitFrequency||"",d.keyNotes||"",d.existingSupplier||"",d.modeOfTransport||""].map(csv).join(",");
+  });
+  // Tasks sheet
+  const taskH=["Subject","Comments","Due Date","Status","Task Type","Related To"].map(csv).join(",");
+  const taskR=visited.map(v=>{
+    const d=v.visitDetail;
+    return[`Sales Visit - ${v.name} - ${todayStr()}`,d.sfText||"",d.followUpDate||"","Not Started","Call",v.name].map(csv).join(",");
+  });
+  return{
+    accsCSV:[accH,...accR].join("\n"),
+    tasksCSV:[taskH,...taskR].join("\n"),
+    count:visited.length
+  };
+}
 
-  const [trips, setTrips] = useState([]);
-  const [activeTrip, setActiveTrip] = useState(null);
-  const [screen, setScreen] = useState("loading");
+function downloadCSV(content,filename){
+  const blob=new Blob([content],{type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
 
-  const [visits, setVisits] = useState([]);
-  const [notes, setNotes] = useState([]);
+// ═══ APP ══════════════════════════════════════════════════════════════════════
+function App(){
+  const [syncStatus,setSyncStatus]=useState("syncing");
+  const [syncMsg,setSyncMsg]=useState("Connecting…");
+  const [screen,setScreen]=useState("loading");
+  const [trips,setTrips]=useState([]);
+  const [activeTrip,setActiveTrip]=useState(null);
+  const [visits,setVisits]=useState([]);
+  const [notes,setNotes]=useState([]);
+  const [myobData,setMyobData]=useState({});
+  const [tab,setTab]=useState("run");
+  const [form,setForm]=useState(newForm());
+  const [output,setOutput]=useState(null);
+  const [copied,setCopied]=useState("");
+  const [filterDay,setFilterDay]=useState("ALL");
+  const [expandedCard,setExpandedCard]=useState(null);
+  const [editingDay,setEditingDay]=useState(null);
+  const [catSearch,setCatSearch]=useState("");
+  const [skuQuery,setSkuQuery]=useState({});
+  const [savedFlash,setSavedFlash]=useState(false);
+  const [noteAccount,setNoteAccount]=useState("");
+  const [transcript,setTranscript]=useState("");
+  const [recordState,setRecordState]=useState("idle");
+  const [recordError,setRecordError]=useState("");
+  const [showKeyEntry,setShowKeyEntry]=useState(false);
+  const [keyInput,setKeyInput]=useState("");
+  const [showArchiveConfirm,setShowArchiveConfirm]=useState(false);
+  // New trip state
+  const [ntName,setNtName]=useState("");
+  const [ntStart,setNtStart]=useState("");
+  const [ntEnd,setNtEnd]=useState("");
+  const [ntRegion,setNtRegion]=useState("");
+  const [sfCSV,setSfCSV]=useState("");
+  const [sfPreview,setSfPreview]=useState([]);
+  const [myobCSV,setMyobCSV]=useState("");
+  const [myobPreview,setMyobPreview]=useState(null);
+  const recognitionRef=useRef(null);
 
-  const [tab, setTab] = useState("run");
-  const [form, setForm] = useState(newForm());
-  const [output, setOutput] = useState(null);
-  const [copied, setCopied] = useState("");
-  const [filterDay, setFilterDay] = useState("ALL");
-  const [expandedCard, setExpandedCard] = useState(null);
-  const [catSearch, setCatSearch] = useState("");
-  const [skuQuery, setSkuQuery] = useState({});
-  const [savedFlash, setSavedFlash] = useState(false);
-
-  const [noteAccount, setNoteAccount] = useState("");
-  const [transcript, setTranscript] = useState("");
-  const [recordState, setRecordState] = useState("idle");
-  const [recordError, setRecordError] = useState("");
-  const [showKeyEntry, setShowKeyEntry] = useState(false);
-  const [keyInput, setKeyInput] = useState("");
-  const recognitionRef = useRef(null);
-
-  const [newTripName, setNewTripName] = useState("");
-  const [newTripStart, setNewTripStart] = useState("");
-  const [newTripEnd, setNewTripEnd] = useState("");
-  const [newTripRegion, setNewTripRegion] = useState("");
-  const [importCSV, setImportCSV] = useState("");
-  const [importPreview, setImportPreview] = useState([]);
-  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
-
-  // ── FIREBASE INIT ─────────────────────────────────────────────────────────
+  // ── FIREBASE ──────────────────────────────────────────────────────────────
   useEffect(()=>{
-    const init = async () => {
-      try {
-        const cloudTrips = await window.FB.loadTrips();
-        const localTrips = S.get("xpak_trips_v1",[]);
-
-        // Merge: cloud wins, but include any local-only trips
-        const cloudIds = new Set(cloudTrips.map(t=>t.id));
-        const localOnly = localTrips.filter(t=>!cloudIds.has(t.id));
-        const merged = [...cloudTrips, ...localOnly];
-
-        if(localOnly.length>0) {
-          // Push local-only trips up to cloud
-          await window.FB.saveTrips(merged);
-        }
-
-        setTrips(merged);
-        setSyncStatus("ok");
-        setSyncMsg("Synced");
-        setScreen("home");
-      } catch(e) {
-        // Fall back to localStorage
-        const localTrips = S.get("xpak_trips_v1",[]);
-        setTrips(localTrips);
-        setSyncStatus("offline");
-        setSyncMsg("Offline — local only");
-        setScreen("home");
-      }
+    const init=async()=>{
+      try{
+        const cloudTrips=await window.FB.loadTrips();
+        const localTrips=S.get("xpak_trips_v1",[]);
+        const cloudIds=new Set(cloudTrips.map(t=>t.id));
+        const localOnly=localTrips.filter(t=>!cloudIds.has(t.id));
+        const merged=[...cloudTrips,...localOnly];
+        if(localOnly.length>0)await window.FB.saveTrips(merged);
+        setTrips(merged);setSyncStatus("ok");setSyncMsg("Synced");
+      }catch(e){setTrips(S.get("xpak_trips_v1",[]));setSyncStatus("offline");setSyncMsg("Offline");}
+      setScreen("home");
     };
-
-    if(window.FB_READY) {
-      init();
-    } else {
-      window.addEventListener("fb-ready", init, {once:true});
-      // Timeout fallback
-      setTimeout(()=>{
-        if(screen==="loading"){
-          const localTrips = S.get("xpak_trips_v1",[]);
-          setTrips(localTrips);
-          setSyncStatus("offline");
-          setSyncMsg("Offline — local only");
-          setScreen("home");
-        }
-      }, 5000);
-    }
+    if(window.FB_READY)init();
+    else{window.addEventListener("fb-ready",init,{once:true});setTimeout(()=>{if(screen==="loading"){setTrips(S.get("xpak_trips_v1",[]));setSyncStatus("offline");setSyncMsg("Offline");setScreen("home");}},5000);}
   },[]);
 
-  // ── SAVE TRIPS ────────────────────────────────────────────────────────────
-  const saveTrips = async (newTrips) => {
-    setTrips(newTrips);
-    S.set("xpak_trips_v1", newTrips);
-    if(window.FB_READY) {
-      setSyncStatus("syncing");
-      try {
-        await window.FB.saveTrips(newTrips);
-        setSyncStatus("ok"); setSyncMsg("Synced");
-      } catch(e) { setSyncStatus("err"); setSyncMsg("Sync failed"); }
+  const saveTrips=async t=>{setTrips(t);S.set("xpak_trips_v1",t);if(window.FB_READY){setSyncStatus("syncing");try{await window.FB.saveTrips(t);setSyncStatus("ok");setSyncMsg("Synced");}catch(e){setSyncStatus("err");setSyncMsg("Sync failed");}}};
+  const saveVisits=async(id,v)=>{S.set("xpak_visits_"+id,v);if(window.FB_READY){setSyncStatus("syncing");try{await window.FB.saveVisits(id,v);setSyncStatus("ok");setSyncMsg("Synced");}catch(e){setSyncStatus("err");setSyncMsg("Sync failed");}}};
+  const saveNotes=async(id,n)=>{S.set("xpak_notes_"+id,n);if(window.FB_READY)try{await window.FB.saveNotes(id,n);}catch(e){}};
+
+  const updateVisits=nv=>{setVisits(nv);if(activeTrip){saveVisits(activeTrip,nv);setSavedFlash(true);setTimeout(()=>setSavedFlash(false),1500);}};
+  const updateNotes=nn=>{setNotes(nn);if(activeTrip)saveNotes(activeTrip,nn);};
+
+  const findMyobMatch=(name,data)=>{
+    if(!data)return null;
+    const norm=s=>s.toLowerCase().replace(/[^a-z0-9]/g,"");
+    const n=norm(name);
+    for(const[k,v]of Object.entries(data)){if(norm(k)===n)return v;}
+    for(const[k,v]of Object.entries(data)){const kn=norm(k);if(kn.includes(n)||n.includes(kn))return v;}
+    return null;
+  };
+
+  const openTrip=async tripId=>{
+    setScreen("trip");setTab("run");setOutput(null);setExpandedCard(null);setActiveTrip(tripId);
+    let v=S.get("xpak_visits_"+tripId,[]);
+    let n=S.get("xpak_notes_"+tripId,[]);
+    if(window.FB_READY)try{v=await window.FB.loadVisits(tripId);n=await window.FB.loadNotes(tripId);S.set("xpak_visits_"+tripId,v);S.set("xpak_notes_"+tripId,n);}catch(e){}
+    setVisits(v);setNotes(n);
+    setMyobData(S.get("xpak_myob_"+tripId,{}));
+  };
+
+  const createTrip=async()=>{
+    if(!ntName||sfPreview.length===0)return;
+    const tripId="trip_"+Date.now();
+    const trip={id:tripId,name:ntName,region:ntRegion,startDate:ntStart,endDate:ntEnd,status:"active",createdAt:new Date().toISOString(),accountCount:sfPreview.length};
+    await saveTrips([...trips,trip]);
+    let enriched=sfPreview;
+    if(myobPreview){
+      enriched=sfPreview.map(a=>{const h=findMyobMatch(a.name,myobPreview);return h?{...a,myobHistory:h}:a;});
+      S.set("xpak_myob_"+tripId,myobPreview);
     }
+    await saveVisits(tripId,enriched);
+    await saveNotes(tripId,[]);
+    setVisits(enriched);setNotes([]);setMyobData(myobPreview||{});
+    setActiveTrip(tripId);setScreen("trip");setTab("run");
+    setNtName("");setNtStart("");setNtEnd("");setNtRegion("");setSfCSV("");setSfPreview([]);setMyobCSV("");setMyobPreview(null);
   };
 
-  // ── SAVE VISITS ───────────────────────────────────────────────────────────
-  const saveVisits = async (tripId, newVisits) => {
-    S.set("xpak_visits_"+tripId, newVisits);
-    if(window.FB_READY) {
-      setSyncStatus("syncing");
-      try {
-        await window.FB.saveVisits(tripId, newVisits);
-        setSyncStatus("ok"); setSyncMsg("Synced");
-      } catch(e) { setSyncStatus("err"); setSyncMsg("Sync failed"); }
-    }
+  const archiveTrip=async()=>{
+    if(!activeTrip)return;
+    await saveTrips(trips.map(t=>t.id===activeTrip?{...t,status:"archived",archivedAt:new Date().toISOString()}:t));
+    setActiveTrip(null);setVisits([]);setNotes([]);setScreen("home");setShowArchiveConfirm(false);
   };
 
-  // ── SAVE NOTES ────────────────────────────────────────────────────────────
-  const saveNotes = async (tripId, newNotes) => {
-    S.set("xpak_notes_"+tripId, newNotes);
-    if(window.FB_READY) {
-      try { await window.FB.saveNotes(tripId, newNotes); } catch(e) {}
-    }
+  const handleMidTripMYOB=text=>{
+    const parsed=parseMYOB(text);
+    S.set("xpak_myob_"+activeTrip,parsed);setMyobData(parsed);
+    updateVisits(visits.map(v=>{const h=findMyobMatch(v.name,parsed);return h?{...v,myobHistory:h}:v;}));
   };
 
-  // ── VISITS CHANGE ─────────────────────────────────────────────────────────
-  const updateVisits = (newVisits) => {
-    setVisits(newVisits);
-    if(activeTrip) {
-      saveVisits(activeTrip, newVisits);
-      setSavedFlash(true);
-      setTimeout(()=>setSavedFlash(false),1500);
-    }
-  };
-
-  const updateNotes = (newNotes) => {
-    setNotes(newNotes);
-    if(activeTrip) saveNotes(activeTrip, newNotes);
-  };
-
-  // ── OPEN TRIP ─────────────────────────────────────────────────────────────
-  const openTrip = async (tripId) => {
-    setScreen("trip");
-    setTab("run");
-    setOutput(null);
-    setExpandedCard(null);
-    setActiveTrip(tripId);
-
-    // Load from cloud first, fall back to local
-    let v = S.get("xpak_visits_"+tripId,[]);
-    let n = S.get("xpak_notes_"+tripId,[]);
-    if(window.FB_READY) {
-      try {
-        v = await window.FB.loadVisits(tripId);
-        n = await window.FB.loadNotes(tripId);
-        S.set("xpak_visits_"+tripId, v);
-        S.set("xpak_notes_"+tripId, n);
-      } catch(e) {}
-    }
-    setVisits(v);
-    setNotes(n);
-  };
-
-  // ── CREATE TRIP ───────────────────────────────────────────────────────────
-  const createTrip = async () => {
-    if(!newTripName||importPreview.length===0) return;
-    const tripId = "trip_"+Date.now();
-    const trip = {
-      id:tripId, name:newTripName, region:newTripRegion,
-      startDate:newTripStart, endDate:newTripEnd,
-      status:"active", createdAt:new Date().toISOString(),
-      accountCount:importPreview.length,
-    };
-    const newTrips = [...trips, trip];
-    await saveTrips(newTrips);
-    await saveVisits(tripId, importPreview);
-    await saveNotes(tripId, []);
-    setVisits(importPreview);
-    setNotes([]);
-    setActiveTrip(tripId);
-    setScreen("trip");
-    setTab("run");
-    setNewTripName(""); setNewTripStart(""); setNewTripEnd(""); setNewTripRegion("");
-    setImportCSV(""); setImportPreview([]);
-  };
-
-  // ── ARCHIVE ───────────────────────────────────────────────────────────────
-  const archiveCurrentTrip = async () => {
-    if(!activeTrip) return;
-    const newTrips = trips.map(t=>t.id===activeTrip?{...t,status:"archived",archivedAt:new Date().toISOString()}:t);
-    await saveTrips(newTrips);
-    setActiveTrip(null);
-    setVisits([]);
-    setNotes([]);
-    setScreen("home");
-    setShowArchiveConfirm(false);
-  };
-
-  const handleCSVPaste = (text) => {
-    setImportCSV(text);
-    setImportPreview(parseSFCSV(text));
-  };
+  const updateVisitField=(vid,field,val)=>updateVisits(visits.map(v=>v.id===vid?{...v,[field]:val}:v));
 
   // ── VISIT LOGIC ───────────────────────────────────────────────────────────
-  const lookupSKUs = (query,formCat) => {
+  const lookupSKUs=(query,cat)=>{
     const q=(query||"").toLowerCase().trim();
-    const allowed=formCat?(CAT_MAP[formCat]||[]):[];
-    return PRICELIST.filter(p=>{
-      const catMatch=allowed.length===0||allowed.includes(p.cat);
-      if(!q) return catMatch&&allowed.length>0;
-      return catMatch&&(p.sku.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q));
-    }).slice(0,8);
+    const items=PRICELIST.filter(p=>p.cat===cat&&(!q||(p.sku.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q))));
+    return items.slice(0,8);
   };
 
-  const generateOutput = () => {
-    const prods = form.products.filter(p=>p.selectedSKU||p.formCat);
-    if(!form.accountName||prods.length===0) return;
-    const alerts = [];
-    if(!form.decisionMaker) alerts.push("DM not captured");
-    let totalEAS = 0;
+  const generateOutput=()=>{
+    const prods=form.products.filter(p=>p.selectedSKU||p.formCat);
+    if(!form.accountName||prods.length===0)return;
+    const alerts=[];if(!form.decisionMaker)alerts.push("DM not captured");
+    let totalEAS=0,totalGPAmt=0,gpSum=0;
     prods.forEach(p=>{
       if(p.selectedSKU&&p.usageRate){
-        const ann=annualise(parseFloat(p.usageRate),p.usageUnit);
-        p.ann=ann;
-        totalEAS+=ann*p.selectedSKU.price;
+        const ann=annualise(parseFloat(p.usageRate),p.usageUnit);p.ann=ann;
+        const rev=ann*p.selectedSKU.price;totalEAS+=rev;totalGPAmt+=rev*(p.selectedSKU.gp/100);gpSum+=p.selectedSKU.gp;
       }
     });
+    const avgGP=prods.length?Math.round(gpSum/prods.length):0;
     const r=getrank(totalEAS);
-    const sfText=`Account: ${form.accountName}\nLocation: ${form.location}\nDecision Maker: ${form.decisionMaker||"Not captured"}\nCurrent Supplier: ${form.currentSupplier||"Not captured"}\nAnnual Est. Value: ${fmtK(totalEAS)}\nAccount Rank: ${r}\nTrial Agreed: ${form.trialAgreed==="Y"?"Yes":"No"}\nQuote Required: ${form.quoteRequired==="Y"?"Yes":"No"}\nFollow Up: ${form.followUpDate||"TBD"}\n\nProducts:\n${prods.map(p=>`• ${p.selectedSKU?p.selectedSKU.desc:(p.formCat||"Product")}${p.selectedSKU?` (${p.selectedSKU.sku})`:""}${p.ann?` — est. ${fmt(p.ann)} ${p.usageUnit} p.a.`:""}${p.painPoint?` | ${p.painPoint}`:""}`).join("\n")}`;
-    const emailText=`Hi,\n\nGreat connecting today at ${form.accountName}.\n\n${form.trialAgreed==="Y"?"✅ Trial agreed — details to follow.\n":""}${form.quoteRequired==="Y"?"📄 Quote to follow.\n":""}\nProducts discussed:\n${prods.map(p=>`• ${p.selectedSKU?p.selectedSKU.desc:(p.formCat||"Product")}${p.painPoint?` — ${p.painPoint}`:""}`).join("\n")}\n\nEst. annual value: ${fmtK(totalEAS)}\n\nI'll follow up ${form.followUpDate?`on ${form.followUpDate}`:"shortly"}.\n\nBest,\n[Your Name] | X-Pak`;
-
+    const prodLines=prods.map(p=>`• ${p.selectedSKU?p.selectedSKU.desc:(p.formCat||"Product")}${p.selectedSKU?` (${p.selectedSKU.sku})`:""}${p.ann?` — est. ${fmt(p.ann)} ${p.usageUnit} p.a.`:""}${p.painPoint?` | ${p.painPoint}`:""}`).join("\n");
+    const sfText=`Account: ${form.accountName}\nLocation: ${form.location}\nIndustry: ${form.industry||"-"}\nDecision Maker: ${form.decisionMaker||"Not captured"}\nInfluencer: ${form.influencer||"-"}\nProcurement: ${form.procurement||"-"}\nCurrent Supplier: ${form.currentSupplier||"Not captured"}\nExisting Supplier (SF): ${form.existingSupplier||"-"}\nAccount Status: ${form.accountStatus||"Buying"}\nMode of Transport: ${form.modeOfTransport||"-"}\nVisit Frequency: ${form.visitFrequency||"-"}\nAnnual Est. Value: $${fmt(totalEAS)}\nAnnual Est. GP: $${fmt(totalGPAmt)} (${avgGP}%)\nAccount Rank: ${r}\nTrial Agreed: ${form.trialAgreed==="Y"?"Yes":"No"}\nQuote Required: ${form.quoteRequired==="Y"?"Yes":"No"}\nFollow Up: ${form.followUpDate||"TBD"}\nKey Notes: ${form.keyNotes||"-"}\n\nProducts:\n${prodLines}`;
+    const emailText=`Hi,\n\nGreat connecting today at ${form.accountName}.\n\n${form.trialAgreed==="Y"?"✅ Trial agreed — details to follow.\n":""}${form.quoteRequired==="Y"?"📄 Quote to follow.\n":""}\nProducts discussed:\n${prods.map(p=>`• ${p.selectedSKU?p.selectedSKU.desc:(p.formCat||"Product")}${p.painPoint?` — ${p.painPoint}`:""}`).join("\n")}\n\nEst. annual value: ${fmtK(totalEAS)}\n\nI'll follow up ${form.followUpDate?`on ${form.followUpDate}`:"shortly"}.\n\nBest regards,\n[Your Name] | X-Pak`;
     if(form.visitId){
-      const newVisits = visits.map(v=>v.id===form.visitId?{
-        ...v,
+      updateVisits(visits.map(v=>v.id===form.visitId?{...v,
         status:form.trialAgreed==="Y"?"done":alerts.length>0?"follow":"visited",
         eas:totalEAS,
-        visitDetail:{
-          decisionMaker:form.decisionMaker,influencer:form.influencer,
-          procurement:form.procurement,owner:form.owner,
-          currentSupplier:form.currentSupplier,trialAgreed:form.trialAgreed,
-          quoteRequired:form.quoteRequired,urgency:form.urgency,
-          followUpDate:form.followUpDate,prods,totalEAS,rank:r,alerts,sfText,emailText,
-          savedAt:new Date().toLocaleString("en-AU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}),
-        }
-      }:v);
-      updateVisits(newVisits);
+        visitDetail:{decisionMaker:form.decisionMaker,influencer:form.influencer,procurement:form.procurement,currentSupplier:form.currentSupplier,existingSupplier:form.existingSupplier,accountStatus:form.accountStatus,modeOfTransport:form.modeOfTransport,visitFrequency:form.visitFrequency,keyNotes:form.keyNotes,trialAgreed:form.trialAgreed,quoteRequired:form.quoteRequired,urgency:form.urgency,followUpDate:form.followUpDate,prods,totalEAS,totalGPAmt,avgGP,rank:r,alerts,sfText,emailText,savedAt:new Date().toLocaleString("en-AU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}}:v));
     }
-    setOutput({prods,totalEAS,rank:r,alerts,sfText,emailText,accountName:form.accountName,location:form.location});
+    setOutput({prods,totalEAS,totalGPAmt,avgGP,rank:r,alerts,sfText,emailText,accountName:form.accountName,location:form.location});
     setTab("output");
   };
 
-  const copy = (text,key) => {
-    navigator.clipboard.writeText(text).catch(()=>{
-      const el=document.createElement("textarea");
-      el.value=text; document.body.appendChild(el);
-      el.select(); document.execCommand("copy");
-      document.body.removeChild(el);
-    });
-    setCopied(key); setTimeout(()=>setCopied(""),2000);
+  const copy=(text,key)=>{
+    navigator.clipboard.writeText(text).catch(()=>{const el=document.createElement("textarea");el.value=text;document.body.appendChild(el);el.select();document.execCommand("copy");document.body.removeChild(el);});
+    setCopied(key);setTimeout(()=>setCopied(""),2000);
   };
 
   // ── VOICE ─────────────────────────────────────────────────────────────────
-  const getApiKey = ()=>{ try{ return localStorage.getItem("xpak_openai_key")||""; }catch(e){ return ""; }};
-  const saveApiKey = (k)=>{ try{ localStorage.setItem("xpak_openai_key",k); }catch(e){} };
+  const getApiKey=()=>{try{return localStorage.getItem("xpak_openai_key")||"";}catch(e){return "";}};
+  const saveApiKey=k=>{try{localStorage.setItem("xpak_openai_key",k);}catch(e){}};
 
-  const startRecording = async () => {
-    setRecordError(""); setTranscript("");
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({audio:true});
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm")?"audio/webm":"audio/mp4";
-      const mediaRecorder = new MediaRecorder(stream,{mimeType});
-      const chunks = [];
-      mediaRecorder.ondataavailable = (e)=>{ if(e.data.size>0) chunks.push(e.data); };
-      mediaRecorder.onstop = async ()=>{
-        stream.getTracks().forEach(t=>t.stop());
-        setRecordState("transcribing");
-        const apiKey = getApiKey();
-        if(!apiKey){ setShowKeyEntry(true); setRecordState("idle"); return; }
-        try {
-          const ext = mimeType.includes("mp4")?"mp4":"webm";
-          const audioBlob = new Blob(chunks,{type:mimeType});
-          const formData = new FormData();
-          formData.append("file",audioBlob,"recording."+ext);
-          formData.append("model","whisper-1");
-          formData.append("language","en");
-          formData.append("prompt","X-Pak packaging sales call. SKU codes like 02.048, 03.112. Suppliers: Fromm, Signode. Towns: Dubbo, Parkes, Griffith, Leeton, Albury, Tumbarumba, Tumut, Young, Bathurst, Mudgee, Wagga.");
-          const resp = await fetch("https://api.openai.com/v1/audio/transcriptions",{
-            method:"POST",headers:{"Authorization":"Bearer "+apiKey},body:formData
-          });
-          const data = await resp.json();
-          if(data.error){ setRecordError("Transcription error: "+data.error.message); setRecordState("idle"); return; }
-          setTranscript(data.text||"");
-          setRecordState("idle");
-        } catch(e){ setRecordError("Transcription failed — check connection."); setRecordState("idle"); }
+  const startRecording=async()=>{
+    setRecordError("");setTranscript("");
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      const mimeType=MediaRecorder.isTypeSupported("audio/webm")?"audio/webm":"audio/mp4";
+      const mr=new MediaRecorder(stream,{mimeType});const chunks=[];
+      mr.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+      mr.onstop=async()=>{
+        stream.getTracks().forEach(t=>t.stop());setRecordState("transcribing");
+        const apiKey=getApiKey();if(!apiKey){setShowKeyEntry(true);setRecordState("idle");return;}
+        try{
+          const ext=mimeType.includes("mp4")?"mp4":"webm";
+          const fd=new FormData();
+          fd.append("file",new Blob(chunks,{type:mimeType}),"rec."+ext);
+          fd.append("model","whisper-1");fd.append("language","en");
+          fd.append("prompt","X-Pak packaging sales. SKU codes like 02.048, 03.112. Suppliers: Fromm, Signode, Signet. Towns: Dubbo, Parkes, Griffith, Leeton, Albury, Tumut, Young, Bathurst, Mudgee, Wagga.");
+          const resp=await fetch("https://api.openai.com/v1/audio/transcriptions",{method:"POST",headers:{"Authorization":"Bearer "+apiKey},body:fd});
+          const data=await resp.json();
+          if(data.error){setRecordError("Transcription error: "+data.error.message);setRecordState("idle");return;}
+          setTranscript(data.text||"");setRecordState("idle");
+        }catch(e){setRecordError("Transcription failed.");setRecordState("idle");}
       };
-      recognitionRef.current = mediaRecorder;
-      mediaRecorder.start();
-      setRecordState("recording");
-    } catch(e){ setRecordError("Mic access denied."); setRecordState("idle"); }
+      recognitionRef.current=mr;mr.start();setRecordState("recording");
+    }catch(e){setRecordError("Mic access denied.");setRecordState("idle");}
   };
 
-  const stopRecording = ()=>{ if(recognitionRef.current){ recognitionRef.current.stop(); recognitionRef.current=null; }};
+  const stopRecording=()=>{if(recognitionRef.current){recognitionRef.current.stop();recognitionRef.current=null;}};
 
-  const summariseNote = async () => {
-    const text = transcript.trim();
-    if(!text){ setRecordError("Nothing to summarise."); return; }
-    const apiKey = getApiKey();
-    if(!apiKey){ setShowKeyEntry(true); return; }
-    setRecordState("processing"); setRecordError("");
-    try {
-      const resp = await fetch("https://api.openai.com/v1/chat/completions",{
-        method:"POST",
-        headers:{"Content-Type":"application/json","Authorization":"Bearer "+apiKey},
-        body:JSON.stringify({
-          model:"gpt-4o-mini",max_tokens:800,
-          messages:[{role:"user",content:`You are an expert B2B sales assistant for X-Pak, a packaging and load restraint company. Summarise these raw voice-to-text field sales call notes into a structured CRM summary.\n\nExtract where present:\nCONTACTS: Name, role, buying style, personality cues\nPRODUCTS: SKU codes, descriptions, quantities, pack sizes\nCOMPETITIVE INTEL: Current supplier, prices they pay, pricing anchors\nVOLUME & VALUE: Usage rates, annualised estimate (flag if uncertain)\nOPPORTUNITY: X-Pak positioning, likelihood of winning\nNEXT STEPS: Actions required, quotes to send, follow-up needed\nNOTES: Anything else relevant\n\nBe concise and specific. Flag uncertain calculations. Capture memorable quotes verbatim.\n\nAccount: ${noteAccount||"Not specified"}\nRaw notes:\n${text}`}]
-        })
-      });
-      const data = await resp.json();
-      if(data.error){ setRecordError("API error: "+data.error.message); setRecordState("idle"); return; }
-      const summary = data.choices?.[0]?.message?.content||"Could not summarise.";
-      const newNote = {
-        id:Date.now(),account:noteAccount||"General",raw:text,summary,
-        time:new Date().toLocaleTimeString("en-AU",{hour:"2-digit",minute:"2-digit"}),
-        date:new Date().toLocaleDateString("en-AU",{weekday:"short",day:"numeric",month:"short"}),
-      };
-      const newNotes = [newNote,...notes];
-      updateNotes(newNotes);
-      setTranscript(""); setNoteAccount(""); setRecordState("idle");
-    } catch(e){ setRecordError("Summarise failed — check connection."); setRecordState("idle"); }
+  const summariseNote=async()=>{
+    const text=transcript.trim();if(!text){setRecordError("Nothing to summarise.");return;}
+    const apiKey=getApiKey();if(!apiKey){setShowKeyEntry(true);return;}
+    setRecordState("processing");setRecordError("");
+    try{
+      const resp=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+apiKey},body:JSON.stringify({model:"gpt-4o-mini",max_tokens:800,messages:[{role:"user",content:`You are an expert B2B sales assistant for X-Pak, a packaging and load restraint company. Summarise these raw voice-to-text field sales call notes into a structured CRM summary.\n\nExtract and format: CONTACTS (name, role), PRODUCTS (SKUs, quantities), COMPETITIVE INTEL (current supplier, pricing), VOLUME & VALUE (usage rates, annualised), OPPORTUNITY, NEXT STEPS.\n\nBe concise. Flag uncertain calculations.\n\nAccount: ${noteAccount||"Not specified"}\nRaw notes:\n${text}`}]})});
+      const data=await resp.json();
+      if(data.error){setRecordError("API error: "+data.error.message);setRecordState("idle");return;}
+      const summary=data.choices?.[0]?.message?.content||"Could not summarise.";
+      const newNote={id:Date.now(),account:noteAccount||"General",raw:text,summary,time:new Date().toLocaleTimeString("en-AU",{hour:"2-digit",minute:"2-digit"}),date:new Date().toLocaleDateString("en-AU",{weekday:"short",day:"numeric",month:"short"})};
+      updateNotes([newNote,...notes]);setTranscript("");setNoteAccount("");setRecordState("idle");
+    }catch(e){setRecordError("Summarise failed.");setRecordState("idle");}
   };
 
   // ── DERIVED ───────────────────────────────────────────────────────────────
-  const nonTBC = visits.filter(v=>!v.isTBC);
-  const doneCount = nonTBC.filter(v=>v.status==="done"||v.status==="visited").length;
-  const followCount = nonTBC.filter(v=>v.status==="follow").length;
-  const pipeline = nonTBC.reduce((s,v)=>s+(v.eas||0),0);
-  const days = [...new Set(visits.map(v=>v.day).filter(Boolean))];
-  const filtered = filterDay==="ALL" ? visits : visits.filter(v=>v.day===filterDay);
-  const grouped = {};
-  filtered.forEach(v=>{ const k=v.day||"UNASSIGNED"; if(!grouped[k]) grouped[k]=[]; grouped[k].push(v); });
-  const dayColors = {"MON":"#4b9cf5","TUE":"#f5a623","WED":"#e8441a","THU":"#4b9cf5","FRI":"#2dd87a"};
-  const vcCls = (s)=>`visit-card vc-${s==="tbc"?"tbc":s}`;
-  const pillC = (s)=>`pill pill-${s}`;
-  const pillL = (s)=>({planned:"☐ Planned",visited:"Visited",follow:"⚠️ Follow-Up",done:"✅ Done",tbc:"TBC"}[s]||s);
-  const activeT = trips.find(t=>t.id===activeTrip);
+  const sortedVisits=[...visits].sort((a,b)=>{
+    const di=DAY_ORDER.indexOf(a.day||"ZZZ")-DAY_ORDER.indexOf(b.day||"ZZZ");
+    return di!==0?di:(a.sortOrder||0)-(b.sortOrder||0);
+  });
+  const nonTBC=sortedVisits.filter(v=>!v.isTBC);
+  const doneCount=nonTBC.filter(v=>v.status==="done"||v.status==="visited").length;
+  const followCount=nonTBC.filter(v=>v.status==="follow").length;
+  const pipeline=nonTBC.reduce((s,v)=>s+(v.eas||0),0);
+  const days=[...new Set(sortedVisits.map(v=>v.day).filter(Boolean))].sort((a,b)=>DAY_ORDER.indexOf(a)-DAY_ORDER.indexOf(b));
+  const filtered=filterDay==="ALL"?sortedVisits:filterDay==="UNASSIGNED"?sortedVisits.filter(v=>!v.day):sortedVisits.filter(v=>v.day===filterDay);
+  const grouped={};filtered.forEach(v=>{const k=v.day||"UNASSIGNED";if(!grouped[k])grouped[k]=[];grouped[k].push(v);});
+  const vcBorderCls=s=>({planned:"vc-planned",visited:"vc-visited",follow:"vc-follow",done:"vc-done"}[s]||"vc-planned");
+  const pillL=s=>({planned:"☐ Planned",visited:"Visited",follow:"⚠ Follow",done:"✅ Done"}[s]||s);
+  const pillCls=s=>({planned:"pill pill-planned",visited:"pill pill-visited",follow:"pill pill-follow",done:"pill pill-done"}[s]||"pill pill-planned");
+  const activeT=trips.find(t=>t.id===activeTrip);
+  const isArchived=activeT?.status==="archived";
 
-  // Sync status indicator
-  const SyncBar = () => (
+  const Logo=()=>(
+    <div className="logo-wrap">
+      <div className="logo-box">X</div>
+      <div className="logo-text"><div className="logo-name">-PAK</div><div className="logo-sub">Field Sales</div></div>
+    </div>
+  );
+
+  const SyncBar=()=>(
     <div className="sync-bar">
       <div className={`sync-dot ${syncStatus}`}/>
       <span style={{color:"var(--muted)"}}>{syncMsg}</span>
     </div>
   );
 
-  // ── LOADING ───────────────────────────────────────────────────────────────
-  if(screen==="loading") return (
+  // ══════════════════════════════════════════════════════════════════════════
+  // LOADING
+  if(screen==="loading")return(
     <div className="loading-screen">
-      <div className="loading-logo">X-PAK</div>
+      <div style={{display:"flex",alignItems:"center",gap:14}}>
+        <div style={{width:60,height:60,background:"var(--accent)",borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"var(--display)",fontWeight:900,fontSize:42,color:"#000"}}>X</div>
+        <div><div style={{fontFamily:"var(--display)",fontWeight:900,fontSize:34,letterSpacing:3}}>-PAK</div><div style={{fontFamily:"var(--mono)",fontSize:10,color:"var(--muted)",letterSpacing:2}}>FIELD SALES</div></div>
+      </div>
       <div className="loading-sub">Connecting to cloud…</div>
     </div>
   );
 
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════════════════
   // HOME
-  // ═══════════════════════════════════════════════════════════════════════════
-  if(screen==="home") return (
+  if(screen==="home")return(
     <div className="app">
       <div className="hdr">
         <div className="hdr-top">
-          <div>
-            <div className="logo">X<em>-PAK</em></div>
-            <div className="hdr-sub">Field Sales · {trips.filter(t=>t.status==="active").length} active trip</div>
-          </div>
+          <Logo/>
+          <div className="hdr-chips"><div className="chip">{trips.filter(t=>t.status==="active").length} active</div></div>
         </div>
         <SyncBar/>
       </div>
       <div className="content">
-        <div className="sec-label" style={{marginBottom:12}}>Active Trips</div>
-        {trips.filter(t=>t.status==="active").length===0 && (
-          <div style={{textAlign:"center",padding:"20px",color:"var(--muted)",fontSize:13,marginBottom:16}}>No active trips. Start one below.</div>
-        )}
+        <div className="sec-label">Active Trips</div>
+        {trips.filter(t=>t.status==="active").length===0&&<div style={{textAlign:"center",padding:"20px",color:"var(--muted)",fontSize:13,marginBottom:14}}>No active trips.</div>}
         {trips.filter(t=>t.status==="active").map(t=>(
           <div key={t.id} className="trip-card active-trip" onClick={()=>openTrip(t.id)}>
-            <div className="trip-card-header">
-              <div>
-                <div className="trip-name">{t.name}</div>
-                <div className="trip-dates">{t.region} · {t.startDate}{t.endDate?` → ${t.endDate}`:""}</div>
-              </div>
-              <span className="trip-status-chip active">ACTIVE</span>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
+              <div><div className="trip-name">{t.name}</div><div className="trip-dates">{t.region} · {t.startDate}{t.endDate?` → ${t.endDate}`:""}</div></div>
+              <span className="status-chip chip-active">ACTIVE</span>
             </div>
-            <div className="trip-stats-row">
-              <div className="trip-stat"><span>{t.accountCount||0}</span><label>Accounts</label></div>
-              <div className="trip-stat"><span style={{color:"var(--accent)"}}>→</span><label>Open</label></div>
-            </div>
+            <div className="trip-stats-row"><div className="trip-stat"><span>{t.accountCount||0}</span><label>Accounts</label></div></div>
           </div>
         ))}
-        <button className="new-trip-btn" style={{marginBottom:20}} onClick={()=>setScreen("newtrip")}>+ Start New Trip</button>
-        {trips.filter(t=>t.status==="archived").length>0 && (
-          <>
-            <div className="sec-label" style={{marginBottom:12}}>Archived Trips</div>
-            {trips.filter(t=>t.status==="archived").map(t=>{
-              const tVisits = S.get("xpak_visits_"+t.id,[]);
-              const tDone = tVisits.filter(v=>v.status==="done"||v.status==="visited").length;
-              const tPipeline = tVisits.reduce((s,v)=>s+(v.eas||0),0);
-              return (
-                <div key={t.id} className="trip-card" onClick={()=>openTrip(t.id)}>
-                  <div className="trip-card-header">
-                    <div>
-                      <div className="trip-name">{t.name}</div>
-                      <div className="trip-dates">{t.region} · {t.startDate}</div>
-                    </div>
-                    <span className="trip-status-chip archived">ARCHIVED</span>
-                  </div>
-                  <div className="trip-stats-row">
-                    <div className="trip-stat"><span>{tDone}</span><label>Visited</label></div>
-                    <div className="trip-stat"><span>{fmtK(tPipeline)}</span><label>Pipeline</label></div>
-                  </div>
+        <button className="new-trip-btn" onClick={()=>setScreen("newtrip")}>+ Start New Trip</button>
+        {trips.filter(t=>t.status==="archived").length>0&&<>
+          <div className="sec-label" style={{marginTop:4}}>Archived</div>
+          {trips.filter(t=>t.status==="archived").map(t=>{
+            const tv=S.get("xpak_visits_"+t.id,[]);
+            return(
+              <div key={t.id} className="trip-card" onClick={()=>openTrip(t.id)}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
+                  <div><div className="trip-name">{t.name}</div><div className="trip-dates">{t.region} · {t.startDate}</div></div>
+                  <span className="status-chip chip-archived">ARCHIVED</span>
                 </div>
-              );
-            })}
-          </>
-        )}
+                <div className="trip-stats-row">
+                  <div className="trip-stat"><span>{tv.filter(v=>["done","visited"].includes(v.status)).length}</span><label>Visited</label></div>
+                  <div className="trip-stat"><span style={{color:"var(--accent)"}}>{fmtK(tv.reduce((s,v)=>s+(v.eas||0),0))}</span><label>Pipeline</label></div>
+                </div>
+              </div>
+            );
+          })}
+        </>}
       </div>
     </div>
   );
 
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════════════════
   // NEW TRIP
-  // ═══════════════════════════════════════════════════════════════════════════
-  if(screen==="newtrip") return (
+  if(screen==="newtrip")return(
     <div className="app">
       <div className="hdr">
-        <div className="hdr-top">
-          <div><div className="logo">X<em>-PAK</em></div><div className="hdr-sub">New Trip</div></div>
-          <button className="chip" onClick={()=>setScreen("home")}>✕ Cancel</button>
-        </div>
+        <div className="hdr-top"><Logo/><button className="chip" onClick={()=>setScreen("home")}>✕ Cancel</button></div>
       </div>
       <div className="content">
         <div className="import-step">
-          <div className="import-step-num">1</div>
-          <div className="import-step-title">Trip Details</div>
-          <div className="field" style={{marginBottom:8}}>
-            <label className="lbl">Trip Name</label>
-            <input className="inp" placeholder="e.g. Central West March 2026" value={newTripName} onChange={e=>setNewTripName(e.target.value)}/>
-          </div>
+          <div className="step-num">1</div><div className="step-title">Trip Details</div>
+          <div className="field"><label className="lbl">Trip Name</label><input className="inp" placeholder="e.g. Central West March 2026" value={ntName} onChange={e=>setNtName(e.target.value)}/></div>
           <div className="inp-row" style={{marginBottom:8}}>
-            <div><label className="lbl">Start Date</label><input className="inp" type="date" value={newTripStart} onChange={e=>setNewTripStart(e.target.value)}/></div>
-            <div><label className="lbl">End Date</label><input className="inp" type="date" value={newTripEnd} onChange={e=>setNewTripEnd(e.target.value)}/></div>
+            <div><label className="lbl">Start</label><input className="inp" type="date" value={ntStart} onChange={e=>setNtStart(e.target.value)}/></div>
+            <div><label className="lbl">End</label><input className="inp" type="date" value={ntEnd} onChange={e=>setNtEnd(e.target.value)}/></div>
           </div>
-          <div className="field">
-            <label className="lbl">Region</label>
-            <input className="inp" placeholder="e.g. Central West NSW · Riverina · Albury" value={newTripRegion} onChange={e=>setNewTripRegion(e.target.value)}/>
-          </div>
+          <div className="field"><label className="lbl">Region</label><input className="inp" placeholder="e.g. Central West NSW · Riverina" value={ntRegion} onChange={e=>setNtRegion(e.target.value)}/></div>
         </div>
+
         <div className="import-step">
-          <div className="import-step-num">2</div>
-          <div className="import-step-title">Import Accounts from Salesforce</div>
-          <div className="import-step-desc">In Salesforce, run your account report → Export → CSV. Open the CSV, select all (Ctrl+A), copy (Ctrl+C) and paste below.<br/><br/><strong style={{color:"var(--text)"}}>Required columns:</strong> Account Name, Shipping City, Industry</div>
-          <textarea className="inp" style={{marginTop:10,minHeight:100,fontSize:12}} placeholder={'Paste CSV data here...\n\n"Account Name","Visit","Shipping City","Industry"\n"Furneys Stockfeeds","0","Dubbo","AG/Stockfeed"'} value={importCSV} onChange={e=>handleCSVPaste(e.target.value)}/>
-          {importPreview.length>0 && (
-            <div style={{marginTop:10}}>
-              <div style={{fontSize:11,color:"var(--green)",fontWeight:600,marginBottom:6}}>✅ {importPreview.length} accounts detected</div>
-              <div className="import-preview">
-                {importPreview.slice(0,8).map((a,i)=>(
-                  <div key={i} className="import-row-preview"><span style={{color:"var(--text)"}}>{a.name}</span><span style={{color:"var(--muted)"}}>{a.location}</span></div>
-                ))}
-                {importPreview.length>8 && <div style={{color:"var(--muted)",padding:"4px 0"}}>...and {importPreview.length-8} more</div>}
-              </div>
+          <div className="step-num">2</div><div className="step-title">Import Accounts from Salesforce</div>
+          <div className="step-desc">SF → Export account report as CSV → Ctrl+A → Ctrl+C → paste below.</div>
+          <textarea className="inp" style={{marginTop:8,minHeight:80,fontSize:12}} placeholder="Paste CSV here…" value={sfCSV} onChange={e=>{setSfCSV(e.target.value);setSfPreview(parseSFCSV(e.target.value));}}/>
+          {sfPreview.length>0&&<div style={{marginTop:8}}>
+            <div style={{fontSize:11,color:"var(--green)",fontWeight:600,marginBottom:5}}>✅ {sfPreview.length} accounts detected</div>
+            <div className="import-preview">
+              {sfPreview.slice(0,6).map((a,i)=><div key={i} className="preview-row"><span style={{color:"var(--text)"}}>{a.name}</span><span style={{color:"var(--muted)"}}>{a.location}</span></div>)}
+              {sfPreview.length>6&&<div style={{color:"var(--muted)",padding:"4px 0"}}>…and {sfPreview.length-6} more</div>}
             </div>
-          )}
+          </div>}
         </div>
-        {importPreview.length>0 && (
-          <div className="import-step">
-            <div className="import-step-num">3</div>
-            <div className="import-step-title">Assign Days (Optional)</div>
-            <div className="import-step-desc">Assign each account to a day. You can also do this later.</div>
-            <div style={{marginTop:10,maxHeight:300,overflowY:"auto"}}>
-              {importPreview.map((a,i)=>(
-                <div key={i} style={{display:"flex",gap:6,alignItems:"center",padding:"6px 0",borderBottom:"1px solid var(--border)"}}>
-                  <div style={{flex:1,fontSize:12,color:"var(--text)"}}>{a.name}</div>
-                  <select className="inp" style={{width:80,fontSize:12,padding:"6px 8px"}} value={a.day||""} onChange={e=>{const u=[...importPreview];u[i]={...u[i],day:e.target.value};setImportPreview(u);}}>
-                    <option value="">Day</option><option>MON</option><option>TUE</option><option>WED</option><option>THU</option><option>FRI</option>
-                  </select>
-                  <input className="inp" type="date" style={{width:130,fontSize:12,padding:"6px 8px"}} value={a.date||""} onChange={e=>{const u=[...importPreview];u[i]={...u[i],date:e.target.value};setImportPreview(u);}}/>
-                </div>
-              ))}
-            </div>
+
+        <div className="import-step">
+          <div className="step-num">3</div><div className="step-title">Upload MYOB Sales History (Optional)</div>
+          <div className="step-desc">MYOB → Reports → Sales → Customer Detail → export as TXT/CSV. Paste full contents below. Account history will appear on each visit card.</div>
+          <textarea className="inp" style={{marginTop:8,minHeight:80,fontSize:12}} placeholder="Paste MYOB export here…" value={myobCSV} onChange={e=>{setMyobCSV(e.target.value);if(e.target.value)setMyobPreview(parseMYOB(e.target.value));}}/>
+          {myobPreview&&<div style={{marginTop:6,fontSize:11,color:"var(--green)",fontWeight:600}}>✅ {Object.keys(myobPreview).length} customers loaded from MYOB</div>}
+        </div>
+
+        {sfPreview.length>0&&<div className="import-step">
+          <div className="step-num">4</div><div className="step-title">Assign Days (Optional — can edit on run sheet)</div>
+          <div style={{maxHeight:280,overflowY:"auto",marginTop:8}}>
+            {sfPreview.map((a,i)=>(
+              <div key={i} style={{display:"flex",gap:6,alignItems:"center",padding:"5px 0",borderBottom:"1px solid var(--border)"}}>
+                <div style={{flex:1,fontSize:11}}>{a.name}</div>
+                <select className="inp" style={{width:75,fontSize:11,padding:"5px 7px"}} value={a.day||""} onChange={e=>{const u=[...sfPreview];u[i]={...u[i],day:e.target.value};setSfPreview(u);}}>
+                  <option value="">Day</option>{DAY_ORDER.slice(0,5).map(d=><option key={d}>{d}</option>)}
+                </select>
+                <input className="inp" type="date" style={{width:125,fontSize:11,padding:"5px 7px"}} value={a.date||""} onChange={e=>{const u=[...sfPreview];u[i]={...u[i],date:e.target.value};setSfPreview(u);}}/>
+              </div>
+            ))}
           </div>
-        )}
-        <button className="btn btn-fire" disabled={!newTripName||importPreview.length===0} style={{opacity:(!newTripName||importPreview.length===0)?0.4:1}} onClick={createTrip}>🚀 Create Trip</button>
+        </div>}
+
+        <button className="btn btn-fire" disabled={!ntName||sfPreview.length===0} onClick={createTrip}>🚀 Create Trip</button>
       </div>
     </div>
   );
 
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════════════════
   // TRIP SCREEN
-  // ═══════════════════════════════════════════════════════════════════════════
-  const isArchived = activeT?.status==="archived";
-
-  return (
+  return(
     <div className="app">
       <div className="hdr">
         <div className="hdr-top">
-          <div>
-            <div className="logo">X<em>-PAK</em></div>
-            <div className="hdr-sub" style={{display:"flex",alignItems:"center",gap:8}}>
-              <span style={{cursor:"pointer",color:"var(--accent)"}} onClick={()=>setScreen("home")}>← Trips</span>
-              <span>· {activeT?.name||"Trip"}</span>
-              {isArchived && <span style={{fontFamily:"var(--mono)",fontSize:9,background:"var(--s3)",padding:"2px 6px",borderRadius:3,color:"var(--muted)"}}>ARCHIVED</span>}
-            </div>
-          </div>
+          <Logo/>
           <div className="hdr-chips">
             <div className="chip">{visits.length} accts</div>
             <div className="chip">{PRICELIST.length} SKUs</div>
           </div>
         </div>
+        <div style={{padding:"0 16px 4px",display:"flex",alignItems:"center",gap:8}}>
+          <span style={{cursor:"pointer",color:"var(--accent)",fontSize:11,fontFamily:"var(--mono)"}} onClick={()=>setScreen("home")}>← Trips</span>
+          <span style={{color:"var(--muted)",fontSize:11}}>· {activeT?.name}</span>
+          {isArchived&&<span style={{fontFamily:"var(--mono)",fontSize:9,background:"var(--s3)",padding:"2px 6px",borderRadius:3,color:"var(--muted)"}}>ARCHIVED</span>}
+        </div>
         <SyncBar/>
         <div className="tabs">
           <button className={`tab ${tab==="run"?"on":""}`} onClick={()=>setTab("run")}>Run Sheet</button>
-          {!isArchived && <button className={`tab ${tab==="log"?"on":""}`} onClick={()=>setTab("log")}>Log Visit</button>}
+          {!isArchived&&<button className={`tab ${tab==="log"?"on":""}`} onClick={()=>setTab("log")}>Log Visit</button>}
           <button className={`tab ${tab==="catalogue"?"on":""}`} onClick={()=>setTab("catalogue")}>Catalogue</button>
           <button className={`tab ${tab==="notes"?"on":""}`} onClick={()=>setTab("notes")}>Notes{notes.length>0?` (${notes.length})`:""}</button>
-          {output && <button className={`tab ${tab==="output"?"on":""}`} onClick={()=>setTab("output")}>Output</button>}
-          {!isArchived && <button className="tab" style={{color:"var(--muted)"}} onClick={()=>setShowArchiveConfirm(true)}>Archive</button>}
+          {output&&<button className={`tab ${tab==="output"?"on":""}`} onClick={()=>setTab("output")}>Output</button>}
+          <button className={`tab ${tab==="export"?"on":""}`} onClick={()=>setTab("export")}>Export</button>
+          {!isArchived&&<button className="tab" style={{color:"var(--muted)"}} onClick={()=>setShowArchiveConfirm(true)}>Archive</button>}
         </div>
       </div>
 
-      {/* RUN SHEET */}
-      {tab==="run" && (
-        <div className="content">
-          {savedFlash && <div className="save-banner">☁️ Saved to cloud</div>}
-          <div className="trip-stats">
-            <div className="ts"><div className="ts-val">{nonTBC.length}</div><div className="ts-lbl">Accounts</div></div>
-            <div className="ts"><div className="ts-val green">{doneCount}</div><div className="ts-lbl">Done</div></div>
-            <div className="ts"><div className="ts-val" style={{color:"var(--accent)"}}>{followCount}</div><div className="ts-lbl">Follow</div></div>
-            <div className="ts"><div className="ts-val" style={{fontSize:pipeline>999999?14:22,color:"var(--green)"}}>{fmtK(pipeline)}</div><div className="ts-lbl">Pipeline</div></div>
-          </div>
-          <div className="day-filter">
-            <button className={`df-btn ${filterDay==="ALL"?"on":""}`} onClick={()=>setFilterDay("ALL")}>ALL</button>
-            {days.map(d=><button key={d} className={`df-btn ${filterDay===d?"on":""}`} onClick={()=>setFilterDay(d)}>{d}</button>)}
-          </div>
-          {Object.entries(grouped).map(([day,dayVisits])=>{
-            const dayDone=dayVisits.filter(v=>v.status==="done"||v.status==="visited").length;
-            const dayPipeline=dayVisits.reduce((s,v)=>s+(v.eas||0),0);
-            const dot=dayColors[day]||"var(--border2)";
-            return (
-              <div key={day}>
-                <div className="day-header">
-                  <div className="day-dot" style={{background:dot}}/>
-                  <div>
-                    <div className="day-title">{day==="UNASSIGNED"?"Unassigned":day}</div>
-                    {dayVisits[0]?.date && <div className="day-sub">{dayVisits[0].date}</div>}
-                    <div className="day-chips">
-                      <span className="day-chip">{dayVisits.length} stops</span>
-                      {dayDone>0 && <span className="day-chip green">{dayDone} done</span>}
-                      {dayPipeline>0 && <span className="day-chip accent">{fmtK(dayPipeline)}</span>}
-                    </div>
+      {/* ── RUN SHEET ── */}
+      {tab==="run"&&<div className="content">
+        {savedFlash&&<div className="save-banner">☁️ Saved</div>}
+        <div className="trip-stats">
+          <div className="ts"><div className="ts-val">{nonTBC.length}</div><div className="ts-lbl">Accounts</div></div>
+          <div className="ts"><div className="ts-val green">{doneCount}</div><div className="ts-lbl">Done</div></div>
+          <div className="ts"><div className="ts-val" style={{color:"var(--accent)"}}>{followCount}</div><div className="ts-lbl">Follow</div></div>
+          <div className="ts"><div className="ts-val" style={{fontSize:pipeline>999999?13:20,color:"var(--green)"}}>{fmtK(pipeline)}</div><div className="ts-lbl">Pipeline</div></div>
+        </div>
+
+        <div className="day-filter">
+          <button className={`df-btn ${filterDay==="ALL"?"on":""}`} onClick={()=>setFilterDay("ALL")}>ALL</button>
+          {days.map(d=><button key={d} className={`df-btn ${filterDay===d?"on":""}`} onClick={()=>setFilterDay(d)}>{d}</button>)}
+          <button className={`df-btn ${filterDay==="UNASSIGNED"?"on":""}`} onClick={()=>setFilterDay("UNASSIGNED")}>Unassigned</button>
+        </div>
+
+        {Object.entries(grouped).map(([day,dayVs])=>{
+          const dayDone=dayVs.filter(v=>["done","visited"].includes(v.status)).length;
+          const dayPipe=dayVs.reduce((s,v)=>s+(v.eas||0),0);
+          const dot=DAY_COLORS[day]||"var(--border2)";
+          const dateStr=dayVs.find(v=>v.date)?.date;
+          return(
+            <div key={day}>
+              <div className="day-header">
+                <div className="day-dot" style={{background:dot}}/>
+                <div>
+                  <div className="day-title">{day==="UNASSIGNED"?"Unassigned":day}</div>
+                  {dateStr&&<div className="day-meta">{dateStr}</div>}
+                  <div className="day-chips">
+                    <span className="day-chip">{dayVs.length} stops</span>
+                    {dayDone>0&&<span className="day-chip green">{dayDone} done</span>}
+                    {dayPipe>0&&<span className="day-chip accent">{fmtK(dayPipe)}</span>}
                   </div>
                 </div>
-                {dayVisits.map(v=>{
-                  const isExp=expandedCard===v.id;
-                  const d=v.visitDetail;
-                  const accNotes=notes.filter(n=>n.account===v.name);
-                  return (
-                    <div key={v.id} className={vcCls(v.status)}>
-                      <div onClick={()=>setExpandedCard(isExp?null:v.id)}>
-                        <div className="vc-top">
-                          <div className={`vc-name${v.isTBC?" tbc":""}`}>{v.name}</div>
-                          <div style={{display:"flex",alignItems:"center",gap:6}}>
-                            {v.eas>0 && <div className="vc-value">{fmtK(v.eas)}</div>}
-                            <span style={{color:"var(--muted)",fontSize:12}}>{isExp?"▲":"▼"}</span>
-                          </div>
-                        </div>
-                        <div className="vc-row">
-                          <span className="vc-loc">📍 {v.location}</span>
-                          <span className={pillC(v.status)}>{pillL(v.status)}</span>
-                          {v.category && <span className="pill pill-cat">{v.category}</span>}
-                          {accNotes.length>0 && <span className="pill pill-cat">🎤 {accNotes.length}</span>}
+              </div>
+
+              {dayVs.map(v=>{
+                const isExp=expandedCard===v.id;
+                const d=v.visitDetail;
+                const hist=v.myobHistory||findMyobMatch(v.name,myobData);
+                const accNotes=notes.filter(n=>n.account===v.name);
+                const isEditDay=editingDay===v.id;
+                return(
+                  <div key={v.id} className={`visit-card ${vcBorderCls(v.status)}`}>
+                    <div onClick={()=>{setExpandedCard(isExp?null:v.id);if(!isExp)setEditingDay(null);}}>
+                      <div className="vc-top">
+                        <div className="vc-name">{v.name}</div>
+                        <div style={{display:"flex",alignItems:"center",gap:5}}>
+                          {v.eas>0&&<div className="vc-value">{fmtK(v.eas)}</div>}
+                          <span style={{color:"var(--muted)",fontSize:11}}>{isExp?"▲":"▼"}</span>
                         </div>
                       </div>
-                      {isExp && (
-                        <div className="card-expanded">
-                          {d ? (
-                            <>
-                              {d.savedAt && <div style={{fontSize:10,color:"var(--muted)",marginBottom:8,fontFamily:"var(--mono)"}}>Logged {d.savedAt}</div>}
-                              <div className="exp-grid">
-                                {d.decisionMaker && <div className="exp-field"><label>Decision Maker</label><div>{d.decisionMaker}</div></div>}
-                                {d.currentSupplier && <div className="exp-field"><label>Current Supplier</label><div>{d.currentSupplier}</div></div>}
-                                {d.followUpDate && <div className="exp-field"><label>Follow Up</label><div style={{color:"var(--accent)"}}>{d.followUpDate}</div></div>}
-                                {d.rank && <div className="exp-field"><label>Rank</label><div style={{color:d.rank==="A"?"var(--green)":d.rank==="B"?"var(--accent)":"var(--muted)"}}>{d.rank}-Account</div></div>}
-                              </div>
-                              <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>
-                                {d.trialAgreed==="Y"&&<span className="pill pill-done">✅ Trial</span>}
-                                {d.quoteRequired==="Y"&&<span className="pill pill-follow">📄 Quote</span>}
-                                {d.urgency==="H"&&<span className="pill pill-follow">🔥 Urgent</span>}
-                              </div>
-                              {d.prods?.length>0 && (
-                                <div className="exp-prods">
-                                  {d.prods.map((p,i)=>{
-                                    const s=p.selectedSKU;
-                                    return <div key={i} className="exp-prod-row">
-                                      <span>{s?<><span style={{fontFamily:"var(--mono)",color:"var(--accent)",fontSize:10}}>{s.sku} </span>{s.desc}</>:(p.formCat||"Product")}</span>
-                                      {p.ann>0&&s&&<span style={{color:"var(--green)"}}>{fmtK(p.ann*s.price)}/yr</span>}
-                                    </div>;
-                                  })}
-                                </div>
-                              )}
-                              <div className="exp-actions">
-                                <button className="btn btn-ghost" style={{flex:1,fontSize:11,padding:"8px",letterSpacing:1}} onClick={()=>copy(d.sfText||"","sf-"+v.id)}>{copied==="sf-"+v.id?"✅ Copied!":"📋 Copy CRM"}</button>
-                                {!isArchived && <button className="btn btn-ghost" style={{flex:1,fontSize:11,padding:"8px",letterSpacing:1}} onClick={()=>{setForm(newForm(v));setTab("log");}}>✏️ Edit</button>}
-                              </div>
-                            </>
-                          ) : (
-                            <div style={{fontSize:12,color:"var(--muted)",marginBottom:10}}>
-                              No visit logged yet.{!isArchived&&<span style={{color:"var(--accent)",cursor:"pointer"}} onClick={()=>{setForm(newForm(v));setTab("log");}}> Log visit →</span>}
-                            </div>
-                          )}
-                          {accNotes.length>0 && (
-                            <div style={{marginTop:10}}>
-                              <div style={{fontSize:9,color:"var(--blue)",textTransform:"uppercase",letterSpacing:1,marginBottom:6}}>Voice Notes ({accNotes.length})</div>
-                              {accNotes.map(n=>(
-                                <div key={n.id} style={{background:"var(--s2)",borderRadius:6,padding:"8px 10px",marginBottom:6}}>
-                                  <div style={{fontSize:9,color:"var(--muted)",fontFamily:"var(--mono)",marginBottom:4}}>{n.date} · {n.time}</div>
-                                  <div style={{fontSize:11,color:"var(--text)",lineHeight:1.5}}>{n.summary}</div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                      <div className="vc-row">
+                        <span className="vc-loc">📍 {v.location}</span>
+                        <span className={pillCls(v.status)}>{pillL(v.status)}</span>
+                        {v.category&&<span className="pill pill-cat">{v.category}</span>}
+                        {hist&&hist.total>0&&<span className="pill pill-cat" style={{color:"var(--blue)",borderColor:"var(--blue)"}}>MYOB ${fmt(hist.total)}</span>}
+                        {accNotes.length>0&&<span className="pill pill-cat">🎤 {accNotes.length}</span>}
+                      </div>
+                    </div>
+
+                    {isExp&&<div className="card-exp">
+                      {/* INLINE DAY EDIT */}
+                      {!isArchived&&(!isEditDay?(
+                        <button style={{background:"none",border:"1px solid var(--border2)",borderRadius:4,color:"var(--muted)",fontSize:10,padding:"4px 8px",cursor:"pointer",fontFamily:"var(--mono)",marginBottom:10}} onClick={e=>{e.stopPropagation();setEditingDay(v.id);}}>
+                          ✏️ {v.day?`${v.day}${v.date?` · ${v.date}`:""}` : "Assign day / date"}
+                        </button>
+                      ):(
+                        <div className="day-edit-row" style={{marginBottom:10}} onClick={e=>e.stopPropagation()}>
+                          <select value={v.day||""} onChange={e=>updateVisitField(v.id,"day",e.target.value)}>
+                            <option value="">No day</option>{DAY_ORDER.slice(0,5).map(d=><option key={d}>{d}</option>)}
+                          </select>
+                          <input type="date" value={v.date||""} onChange={e=>updateVisitField(v.id,"date",e.target.value)}/>
+                          <button style={{background:"var(--green)",border:"none",borderRadius:4,color:"#000",padding:"5px 10px",fontSize:12,fontWeight:700,cursor:"pointer"}} onClick={()=>setEditingDay(null)}>✓ Done</button>
+                        </div>
+                      ))}
+
+                      {/* MYOB HISTORY */}
+                      {hist&&hist.total>0&&(
+                        <div className="myob-block">
+                          <div className="myob-title">📊 MYOB Purchase History (12 months)</div>
+                          {Object.entries(hist.byCategory).filter(([,a])=>a>0).sort(([,a],[,b])=>b-a).map(([cat,amt])=>(
+                            <div key={cat} className="myob-row"><span className="myob-cat">{cat}</span><span className="myob-amt">${fmt(amt)}</span></div>
+                          ))}
+                          <div className="myob-total-row">
+                            <span className="myob-total-lbl">Total</span>
+                            <span className="myob-total-val">${fmt(hist.total)}</span>
+                          </div>
                         </div>
                       )}
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })}
-          {!isArchived && <button className="fab" onClick={()=>{setForm(newForm());setTab("log");}}>➕</button>}
-        </div>
-      )}
 
-      {/* LOG VISIT */}
-      {tab==="log" && !isArchived && (
-        <div className="content">
-          <div className="form-section">
-            <div className="form-section-title">A · Decision Structure</div>
-            <div className="section-card">
-              <div className="inp-row">
-                <div className="field"><label className="lbl">Account</label><input className="inp" value={form.accountName} onChange={e=>setForm(f=>({...f,accountName:e.target.value}))} placeholder="Account name"/></div>
-                <div className="field"><label className="lbl">Location</label><input className="inp" value={form.location} onChange={e=>setForm(f=>({...f,location:e.target.value}))} placeholder="City"/></div>
-              </div>
-              <div className="field">
-                <label className="lbl">Decision Maker {!form.decisionMaker&&<span style={{color:"var(--accent)"}}>⚠️</span>}</label>
-                <input className="inp" value={form.decisionMaker} onChange={e=>setForm(f=>({...f,decisionMaker:e.target.value}))} placeholder="Name + role..."/>
-                {!form.decisionMaker&&<div className="alert-inline">⚠️ DM not captured</div>}
-              </div>
-              <div className="inp-row">
-                <div className="field"><label className="lbl">Influencer</label><input className="inp" value={form.influencer} onChange={e=>setForm(f=>({...f,influencer:e.target.value}))}/></div>
-                <div className="field"><label className="lbl">Procurement</label><input className="inp" value={form.procurement} onChange={e=>setForm(f=>({...f,procurement:e.target.value}))}/></div>
-              </div>
-              <div className="inp-row">
-                <div className="field"><label className="lbl">Owner</label><input className="inp" value={form.owner} onChange={e=>setForm(f=>({...f,owner:e.target.value}))}/></div>
-                <div className="field"><label className="lbl">Current Supplier</label><input className="inp" value={form.currentSupplier} onChange={e=>setForm(f=>({...f,currentSupplier:e.target.value}))}/></div>
-              </div>
-            </div>
-          </div>
-          <div className="form-section">
-            <div className="form-section-title">B · Products</div>
-            {form.products.map((prod,pi)=>(
-              <div key={prod.id} className="prod-block">
-                <div className="prod-block-title">Product {pi+1}</div>
-                <div className="field">
-                  <label className="lbl">Category</label>
-                  <select className="inp" value={prod.formCat} onChange={e=>{const v=e.target.value;setForm(f=>({...f,products:f.products.map((p,i)=>i===pi?{...p,formCat:v,selectedSKU:null}:p)}));setSkuQuery(q=>({...q,[prod.id]:""}));}}>
-                    <option value="">Select category...</option>
-                    {CATEGORIES.map(c=><option key={c}>{c}</option>)}
-                  </select>
-                </div>
-                {prod.formCat && (
-                  <div className="field">
-                    <label className="lbl">SKU Search</label>
-                    <input className="inp" placeholder="Search by SKU or description..." value={skuQuery[prod.id]||""} onChange={e=>setSkuQuery(q=>({...q,[prod.id]:e.target.value}))}/>
-                    {!prod.selectedSKU && (
-                      <div className="sku-list">
-                        {lookupSKUs(skuQuery[prod.id],prod.formCat).map(s=>(
-                          <div key={s.sku} className="sku-item" onClick={()=>setForm(f=>({...f,products:f.products.map((p,i)=>i===pi?{...p,selectedSKU:s}:p)}))}>
-                            <div><div className="sku-code">{s.sku}</div><div className="sku-desc">{s.desc}</div><div style={{fontSize:9,color:"var(--muted)"}}>{s.unit}</div></div>
-                            <div style={{textAlign:"right"}}><div className="sku-price">${s.price}</div><div className="sku-gp">{s.gp}% GP</div></div>
+                      {/* VISIT DETAIL */}
+                      {d?(
+                        <>
+                          {d.savedAt&&<div style={{fontSize:10,color:"var(--muted)",marginBottom:7,fontFamily:"var(--mono)"}}>Logged {d.savedAt}</div>}
+                          <div className="exp-grid">
+                            {d.decisionMaker&&<div className="exp-field"><label>Decision Maker</label><div>{d.decisionMaker}</div></div>}
+                            {d.currentSupplier&&<div className="exp-field"><label>Curr. Supplier</label><div>{d.currentSupplier}</div></div>}
+                            {d.followUpDate&&<div className="exp-field"><label>Follow Up</label><div style={{color:"var(--accent)"}}>{d.followUpDate}</div></div>}
+                            {d.rank&&<div className="exp-field"><label>Rank</label><div style={{color:d.rank==="A"?"var(--green)":d.rank==="B"?"var(--accent)":"var(--muted)"}}>{d.rank}-Account</div></div>}
+                          </div>
+                          {d.keyNotes&&<div style={{fontSize:11,color:"var(--muted)",marginBottom:8,fontStyle:"italic",borderLeft:"2px solid var(--border2)",paddingLeft:8}}>{d.keyNotes}</div>}
+                          <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:8}}>
+                            {d.trialAgreed==="Y"&&<span className="pill pill-done">✅ Trial</span>}
+                            {d.quoteRequired==="Y"&&<span className="pill pill-follow">📄 Quote</span>}
+                            {d.urgency==="H"&&<span className="pill pill-follow">🔥 Urgent</span>}
+                            {d.totalEAS>0&&<span className="pill" style={{background:"var(--green-dim)",borderColor:"var(--green)",color:"var(--green)"}}>${fmt(d.totalEAS)}/yr</span>}
+                            {d.totalGPAmt>0&&<span className="pill" style={{background:"var(--blue-dim)",borderColor:"var(--blue)",color:"var(--blue)"}}>GP ${fmt(d.totalGPAmt)}</span>}
+                          </div>
+                          <div className="exp-actions">
+                            <button className="btn btn-ghost" style={{flex:1,fontSize:10,padding:"7px",letterSpacing:1}} onClick={()=>copy(d.sfText||"","sf-"+v.id)}>{copied==="sf-"+v.id?"✅ Copied!":"📋 CRM Text"}</button>
+                            {!isArchived&&<button className="btn btn-ghost" style={{flex:1,fontSize:10,padding:"7px",letterSpacing:1}} onClick={()=>{setForm(newForm(v));setTab("log");}}>✏️ Edit</button>}
+                          </div>
+                        </>
+                      ):(
+                        <div style={{fontSize:12,color:"var(--muted)",marginBottom:8}}>No visit logged yet.{!isArchived&&<span style={{color:"var(--accent)",cursor:"pointer"}} onClick={()=>{setForm(newForm(v));setTab("log");}}> Log visit →</span>}</div>
+                      )}
+
+                      {accNotes.length>0&&<div style={{marginTop:8}}>
+                        <div style={{fontSize:9,color:"var(--blue)",textTransform:"uppercase",letterSpacing:1,marginBottom:5}}>Voice Notes</div>
+                        {accNotes.slice(0,2).map(n=>(
+                          <div key={n.id} style={{background:"var(--s2)",borderRadius:5,padding:"7px 9px",marginBottom:5}}>
+                            <div style={{fontSize:9,color:"var(--muted)",fontFamily:"var(--mono)",marginBottom:3}}>{n.date} · {n.time}</div>
+                            <div style={{fontSize:11,color:"var(--text)",lineHeight:1.5}}>{n.summary}</div>
                           </div>
                         ))}
-                      </div>
-                    )}
-                    {prod.selectedSKU && (
-                      <div className="sku-selected">
-                        <div><div style={{fontFamily:"var(--mono)",fontSize:10,color:"var(--green)"}}>{prod.selectedSKU.sku}</div><div style={{fontSize:11}}>{prod.selectedSKU.desc}</div><div style={{fontSize:10,color:"var(--accent)"}}>${prod.selectedSKU.price} · {prod.selectedSKU.gp}% GP</div></div>
-                        <button className="sku-clear" onClick={()=>setForm(f=>({...f,products:f.products.map((p,i)=>i===pi?{...p,selectedSKU:null}:p)}))}>✕</button>
-                      </div>
-                    )}
+                      </div>}
+                    </div>}
                   </div>
-                )}
-                <div className="inp-row">
-                  <div className="field"><label className="lbl">Usage Rate</label><input className="inp" type="number" value={prod.usageRate} onChange={e=>setForm(f=>({...f,products:f.products.map((p,i)=>i===pi?{...p,usageRate:e.target.value}:p)}))} placeholder="0"/></div>
-                  <div className="field"><label className="lbl">Per</label>
-                    <select className="inp" value={prod.usageUnit} onChange={e=>setForm(f=>({...f,products:f.products.map((p,i)=>i===pi?{...p,usageUnit:e.target.value}:p)}))} >
-                      <option>rolls/week</option><option>rolls/month</option><option>bags/week</option><option>bags/month</option><option>units/week</option><option>units/month</option><option>pallets/month</option>
-                    </select>
-                  </div>
-                </div>
-                {prod.selectedSKU && prod.usageRate && (
-                  <div className="live-calc">
-                    <div className="lc-row"><span className="lc-label">Annual units</span><span className="lc-val">{fmt(annualise(parseFloat(prod.usageRate),prod.usageUnit))}</span></div>
-                    <div className="lc-row"><span className="lc-label">Annual revenue</span><span className="lc-val">{fmtK(annualise(parseFloat(prod.usageRate),prod.usageUnit)*prod.selectedSKU.price)}</span></div>
-                    <div className="lc-row"><span className="lc-label">GP</span><span className="lc-val">{prod.selectedSKU.gp}%</span></div>
-                  </div>
-                )}
-                <div className="field">
-                  <label className="lbl">Current Supplier / Pain Point</label>
-                  <input className="inp" value={prod.painPoint} onChange={e=>setForm(f=>({...f,products:f.products.map((p,i)=>i===pi?{...p,painPoint:e.target.value}:p)}))} placeholder="e.g. Fromm, price issues..."/>
-                </div>
-                {form.products.length>1 && <button className="btn btn-ghost" style={{padding:"8px",fontSize:11}} onClick={()=>setForm(f=>({...f,products:f.products.filter((_,i)=>i!==pi)}))}>Remove Product</button>}
-              </div>
-            ))}
-            <button className="add-prod" onClick={()=>setForm(f=>({...f,products:[...f.products,newProd()]}))}>+ Add Another Product</button>
-          </div>
-          <div className="form-section">
-            <div className="form-section-title">C · Commercial</div>
-            <div className="section-card">
-              <div className="field"><label className="lbl">Trial Agreed?</label>
-                <div className="tog-row">{["Y","N"].map(v=><button key={v} className={`tog ${form.trialAgreed===v?(v==="Y"?"t-y":"t-n"):""}`} onClick={()=>setForm(f=>({...f,trialAgreed:v}))}>{v==="Y"?"Yes":"No"}</button>)}</div>
-              </div>
-              <div className="field"><label className="lbl">Quote Required?</label>
-                <div className="tog-row">{["Y","N"].map(v=><button key={v} className={`tog ${form.quoteRequired===v?(v==="Y"?"t-y":"t-n"):""}`} onClick={()=>setForm(f=>({...f,quoteRequired:v}))}>{v==="Y"?"Yes":"No"}</button>)}</div>
-              </div>
-              <div className="field"><label className="lbl">Urgency</label>
-                <div className="tog-row">{[["H","🔥 High"],["M","Medium"],["L","Low"]].map(([v,l])=><button key={v} className={`tog ${form.urgency===v?`t-${v.toLowerCase()}`:""}`} onClick={()=>setForm(f=>({...f,urgency:v}))}>{l}</button>)}</div>
-              </div>
-              <div className="field"><label className="lbl">Follow-Up Date</label><input className="inp" type="date" value={form.followUpDate} onChange={e=>setForm(f=>({...f,followUpDate:e.target.value}))}/></div>
+                );
+              })}
             </div>
-          </div>
-          <button className="btn btn-fire" onClick={generateOutput}>⚡ Generate Output</button>
-          <button className="btn btn-ghost" onClick={()=>{setForm(newForm());setTab("run");}}>Cancel</button>
-        </div>
-      )}
+          );
+        })}
+        {!isArchived&&<button className="fab" onClick={()=>{setForm(newForm());setTab("log");}}>➕</button>}
+      </div>}
 
-      {/* CATALOGUE */}
-      {tab==="catalogue" && (
-        <div className="content">
-          <input className="search-box" placeholder="Search SKU or description..." value={catSearch} onChange={e=>setCatSearch(e.target.value)}/>
-          {CATEGORIES.filter(c=>c!=="Other").map(cat=>{
-            const items=PRICELIST.filter(p=>p.cat===cat&&(!catSearch||p.sku.toLowerCase().includes(catSearch.toLowerCase())||p.desc.toLowerCase().includes(catSearch.toLowerCase())));
-            if(!items.length) return null;
-            return (
-              <div key={cat} className="cat-section">
-                <div className="cat-section-title">{cat}</div>
-                {items.map(p=>(
-                  <div key={p.sku} className="cat-row" onClick={()=>{setForm(f=>({...f,products:f.products.map((prod,i)=>i===f.products.length-1?{...prod,formCat:cat,selectedSKU:p}:prod)}));setTab("log");}}>
-                    <div className="cat-sku">{p.sku}</div>
-                    <div className="cat-name">{p.desc}</div>
-                    <div style={{textAlign:"right"}}><div className="cat-price">${p.price}</div><div className="cat-unit">{p.unit} · {p.gp}% GP</div></div>
-                  </div>
-                ))}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* NOTES */}
-      {tab==="notes" && (
-        <div className="content">
-          <div className="sec-label" style={{marginBottom:12}}>Voice Notes · {notes.length} saved</div>
-          {!isArchived && (
-            <div className="section-card" style={{marginBottom:16}}>
-              <div className="field">
-                <label className="lbl">Account</label>
-                <select className="inp" value={noteAccount} onChange={e=>setNoteAccount(e.target.value)}>
-                  <option value="">General / Trip Note</option>
-                  {visits.filter(v=>!v.isTBC).map(v=><option key={v.id} value={v.name}>{v.name} — {v.location}</option>)}
+      {/* ── LOG VISIT ── */}
+      {tab==="log"&&!isArchived&&<div className="content">
+        <div className="form-section">
+          <div className="form-section-title">A · Account</div>
+          <div className="section-card">
+            <div className="inp-row">
+              <div className="field"><label className="lbl">Account Name</label><input className="inp" value={form.accountName} onChange={e=>setForm(f=>({...f,accountName:e.target.value}))} placeholder="Account name"/></div>
+              <div className="field"><label className="lbl">Location</label><input className="inp" value={form.location} onChange={e=>setForm(f=>({...f,location:e.target.value}))} placeholder="City"/></div>
+            </div>
+            <div className="inp-row">
+              <div className="field"><label className="lbl">Account Status</label>
+                <select className="inp" value={form.accountStatus} onChange={e=>setForm(f=>({...f,accountStatus:e.target.value}))}>
+                  {SF_ACCOUNT_STATUS.map(s=><option key={s}>{s}</option>)}
                 </select>
               </div>
-              {showKeyEntry && (
-                <div style={{background:"var(--s2)",border:"1px solid var(--accent)",borderRadius:8,padding:14,marginBottom:12}}>
-                  <div className="sec-label" style={{marginBottom:8,color:"var(--accent)"}}>🔑 Enter OpenAI API Key</div>
-                  <div style={{fontSize:12,color:"var(--muted)",marginBottom:10,lineHeight:1.5}}>Saved only on this device — never shared.</div>
-                  <input type="password" className="inp" style={{marginBottom:8}} placeholder="sk-proj-..." value={keyInput} onChange={e=>setKeyInput(e.target.value)}/>
-                  <button className="btn btn-accent" onClick={()=>{if(keyInput.trim().startsWith("sk-")){saveApiKey(keyInput.trim());setKeyInput("");setShowKeyEntry(false);}else setRecordError("Invalid key — should start with sk-");}}>Save Key</button>
-                  <button className="btn btn-ghost" style={{marginTop:4}} onClick={()=>setShowKeyEntry(false)}>Cancel</button>
-                </div>
-              )}
-              {getApiKey() && !showKeyEntry && (
-                <div style={{textAlign:"right",marginBottom:6}}>
-                  <button style={{background:"none",border:"none",color:"var(--muted)",fontSize:10,cursor:"pointer"}} onClick={()=>{localStorage.removeItem("xpak_openai_key");setRecordError("Key cleared.");}}>🔑 Clear saved key</button>
-                </div>
-              )}
-              <button className={`record-btn ${recordState}`} onClick={recordState==="recording"?stopRecording:startRecording} disabled={recordState==="processing"||recordState==="transcribing"}>
-                {recordState==="idle"&&<><span>🎤</span>Tap to Record</>}
-                {recordState==="recording"&&<><span>⏹</span>Recording… Tap to Stop</>}
-                {recordState==="transcribing"&&<><span>⏳</span>Transcribing with Whisper…</>}
-                {recordState==="processing"&&<><span>✨</span>Summarising…</>}
-              </button>
-              {transcript && <textarea className="inp" style={{marginBottom:8}} value={transcript} onChange={e=>setTranscript(e.target.value)} placeholder="Transcript appears here…"/>}
-              {recordError && <div className="alert-inline">⚠️ {recordError}</div>}
-              {transcript && recordState==="idle" && <button className="btn btn-fire" onClick={summariseNote}>✨ Summarise with AI</button>}
-            </div>
-          )}
-          {notes.length===0 ? (
-            <div className="empty-notes"><div className="big">🎤</div><div>Record a voice note above to get started.</div></div>
-          ) : notes.map(note=>(
-            <div key={note.id} className="note-card">
-              <div className="note-card-header">
-                <div><div className="note-account-name">{note.account}</div><div className="note-time">{note.date} · {note.time}</div></div>
-                {!isArchived && <button className="del-note" onClick={()=>updateNotes(notes.filter(x=>x.id!==note.id))}>🗑</button>}
+              <div className="field"><label className="lbl">Industry</label>
+                <select className="inp" value={form.industry} onChange={e=>setForm(f=>({...f,industry:e.target.value}))}>
+                  <option value="">Select…</option>{SF_INDUSTRY.map(s=><option key={s}>{s}</option>)}
+                </select>
               </div>
-              {note.summary && <><div className="note-summary-label">AI Summary</div><div className="note-summary">{note.summary}</div></>}
-              {note.raw && <details style={{marginTop:10}}><summary style={{fontSize:10,color:"var(--muted)",cursor:"pointer",fontFamily:"var(--mono)"}}>Raw transcript ▾</summary><div className="note-raw" style={{marginTop:6}}>{note.raw}</div></details>}
-              <button className="btn btn-ghost" style={{marginTop:12,fontSize:11,padding:"8px",letterSpacing:1}} onClick={()=>copy(`CALL NOTES — ${note.account} (${note.date} ${note.time})\n\n${note.summary}`,"note-"+note.id)}>
-                {copied==="note-"+note.id?"✅ Copied!":"📋 Copy to CRM"}
-              </button>
+            </div>
+            <div className="inp-row">
+              <div className="field"><label className="lbl">Mode of Transport</label>
+                <select className="inp" value={form.modeOfTransport} onChange={e=>setForm(f=>({...f,modeOfTransport:e.target.value}))}>
+                  <option value="">Select…</option>{SF_TRANSPORT.map(s=><option key={s}>{s}</option>)}
+                </select>
+              </div>
+              <div className="field"><label className="lbl">Visit Frequency</label>
+                <select className="inp" value={form.visitFrequency} onChange={e=>setForm(f=>({...f,visitFrequency:e.target.value}))}>
+                  <option value="">Select…</option>{SF_VISIT_FREQ.map(s=><option key={s}>{s}</option>)}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="form-section">
+          <div className="form-section-title">B · Contacts</div>
+          <div className="section-card">
+            <div className="field">
+              <label className="lbl">Decision Maker {!form.decisionMaker&&<span style={{color:"var(--accent)"}}>⚠️</span>}</label>
+              <input className="inp" value={form.decisionMaker} onChange={e=>setForm(f=>({...f,decisionMaker:e.target.value}))} placeholder="Name + role"/>
+              {!form.decisionMaker&&<div className="alert-inline">⚠️ DM not captured — flag on export</div>}
+            </div>
+            <div className="inp-row">
+              <div className="field"><label className="lbl">Influencer</label><input className="inp" value={form.influencer} onChange={e=>setForm(f=>({...f,influencer:e.target.value}))}/></div>
+              <div className="field"><label className="lbl">Procurement</label><input className="inp" value={form.procurement} onChange={e=>setForm(f=>({...f,procurement:e.target.value}))}/></div>
+            </div>
+            <div className="inp-row">
+              <div className="field"><label className="lbl">Current Supplier (free text)</label><input className="inp" value={form.currentSupplier} onChange={e=>setForm(f=>({...f,currentSupplier:e.target.value}))} placeholder="e.g. Signode, Fromm"/></div>
+              <div className="field"><label className="lbl">Existing Supplier (SF list)</label>
+                <select className="inp" value={form.existingSupplier} onChange={e=>setForm(f=>({...f,existingSupplier:e.target.value}))}>
+                  <option value="">Select…</option>{SF_SUPPLIERS.map(s=><option key={s}>{s}</option>)}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="form-section">
+          <div className="form-section-title">C · Products</div>
+          {form.products.map((prod,pi)=>(
+            <div key={prod.id} className="prod-block">
+              <div className="prod-block-title">Product {pi+1}</div>
+              <div className="field"><label className="lbl">Category</label>
+                <select className="inp" value={prod.formCat} onChange={e=>{const v=e.target.value;setForm(f=>({...f,products:f.products.map((p,i)=>i===pi?{...p,formCat:v,selectedSKU:null}:p)}));setSkuQuery(q=>({...q,[prod.id]:""}));}}>
+                  <option value="">Select category…</option>{CATEGORIES.map(c=><option key={c}>{c}</option>)}
+                </select>
+              </div>
+              {prod.formCat&&<div className="field">
+                <label className="lbl">SKU</label>
+                <input className="inp" placeholder="Search SKU or description…" value={skuQuery[prod.id]||""} onChange={e=>setSkuQuery(q=>({...q,[prod.id]:e.target.value}))}/>
+                {!prod.selectedSKU&&<div className="sku-list">
+                  {lookupSKUs(skuQuery[prod.id],prod.formCat).map(s=>(
+                    <div key={s.sku} className="sku-item" onClick={()=>setForm(f=>({...f,products:f.products.map((p,i)=>i===pi?{...p,selectedSKU:s}:p)}))}>
+                      <div><div className="sku-code">{s.sku}</div><div className="sku-desc">{s.desc}</div></div>
+                      <div style={{textAlign:"right"}}><div className="sku-price">${s.price}</div><div className="sku-gp">{s.gp}% GP</div></div>
+                    </div>
+                  ))}
+                </div>}
+                {prod.selectedSKU&&<div className="sku-selected">
+                  <div><div style={{fontFamily:"var(--mono)",fontSize:10,color:"var(--green)"}}>{prod.selectedSKU.sku}</div><div style={{fontSize:11}}>{prod.selectedSKU.desc}</div><div style={{fontSize:10,color:"var(--accent)"}}>${prod.selectedSKU.price} · {prod.selectedSKU.gp}% GP</div></div>
+                  <button className="sku-clear" onClick={()=>setForm(f=>({...f,products:f.products.map((p,i)=>i===pi?{...p,selectedSKU:null}:p)}))}>✕</button>
+                </div>}
+              </div>}
+              <div className="inp-row">
+                <div className="field"><label className="lbl">Usage Rate</label><input className="inp" type="number" value={prod.usageRate} onChange={e=>setForm(f=>({...f,products:f.products.map((p,i)=>i===pi?{...p,usageRate:e.target.value}:p)}))} placeholder="0"/></div>
+                <div className="field"><label className="lbl">Per</label>
+                  <select className="inp" value={prod.usageUnit} onChange={e=>setForm(f=>({...f,products:f.products.map((p,i)=>i===pi?{...p,usageUnit:e.target.value}:p)}))}>
+                    {["rolls/week","rolls/month","bags/week","bags/month","units/week","units/month","pallets/month","ctns/month"].map(u=><option key={u}>{u}</option>)}
+                  </select>
+                </div>
+              </div>
+              {prod.selectedSKU&&prod.usageRate&&<div className="live-calc">
+                <div className="lc-row"><span className="lc-label">Annual units</span><span className="lc-val">{fmt(annualise(parseFloat(prod.usageRate),prod.usageUnit))}</span></div>
+                <div className="lc-row"><span className="lc-label">Annual revenue</span><span className="lc-val">{fmtK(annualise(parseFloat(prod.usageRate),prod.usageUnit)*prod.selectedSKU.price)}</span></div>
+                <div className="lc-row"><span className="lc-label">GP</span><span className="lc-val">{prod.selectedSKU.gp}%</span></div>
+              </div>}
+              <div className="field"><label className="lbl">Pain Point / Competitor</label><input className="inp" value={prod.painPoint} onChange={e=>setForm(f=>({...f,products:f.products.map((p,i)=>i===pi?{...p,painPoint:e.target.value}:p)}))} placeholder="e.g. Fromm, price issues…"/></div>
+              {form.products.length>1&&<button className="btn btn-ghost" style={{padding:"7px",fontSize:11}} onClick={()=>setForm(f=>({...f,products:f.products.filter((_,i)=>i!==pi)}))}>Remove</button>}
             </div>
           ))}
+          <button className="add-prod" onClick={()=>setForm(f=>({...f,products:[...f.products,newProd()]}))}>+ Add Another Product</button>
         </div>
-      )}
 
-      {/* OUTPUT */}
-      {tab==="output" && output && (
-        <div className="content">
-          <div className="out-hero">
-            <div className="out-account">{output.accountName}</div>
-            <div style={{fontSize:11,color:"var(--muted)",marginBottom:10}}>📍 {output.location}</div>
-            <div className="out-grid">
-              <div><div className="out-val green">{fmtK(output.totalEAS)}</div><div className="out-lbl">Est. Annual Spend</div></div>
-              <div><div className="out-val accent">{output.prods.length}</div><div className="out-lbl">Products</div></div>
+        <div className="form-section">
+          <div className="form-section-title">D · Commercial</div>
+          <div className="section-card">
+            <div className="field"><label className="lbl">Trial Agreed?</label>
+              <div className="tog-row">{["Y","N"].map(v=><button key={v} className={`tog ${form.trialAgreed===v?(v==="Y"?"t-y":"t-n"):""}`} onClick={()=>setForm(f=>({...f,trialAgreed:v}))}>{v==="Y"?"Yes":"No"}</button>)}</div>
             </div>
-            <div className={`rank-chip rank-${output.rank}`}>⭐ {output.rank}-Account</div>
+            <div className="field"><label className="lbl">Quote Required?</label>
+              <div className="tog-row">{["Y","N"].map(v=><button key={v} className={`tog ${form.quoteRequired===v?(v==="Y"?"t-y":"t-n"):""}`} onClick={()=>setForm(f=>({...f,quoteRequired:v}))}>{v==="Y"?"Yes":"No"}</button>)}</div>
+            </div>
+            <div className="field"><label className="lbl">Urgency</label>
+              <div className="tog-row">{[["H","🔥 High"],["M","Medium"],["L","Low"]].map(([v,l])=><button key={v} className={`tog ${form.urgency===v?`t-${v.toLowerCase()}`:""}`} onClick={()=>setForm(f=>({...f,urgency:v}))}>{l}</button>)}</div>
+            </div>
+            <div className="field"><label className="lbl">Follow-Up Date</label><input className="inp" type="date" value={form.followUpDate} onChange={e=>setForm(f=>({...f,followUpDate:e.target.value}))}/></div>
+            <div className="field"><label className="lbl">Key Notes (SF Key Notes field)</label><textarea className="inp" value={form.keyNotes} onChange={e=>setForm(f=>({...f,keyNotes:e.target.value}))} placeholder="Key observations for CRM…"/></div>
           </div>
-          {output.alerts.length>0 && <div className="alert-inline">⚠️ {output.alerts.join(" · ")}</div>}
-          <div className="out-block">
-            {output.prods.map((p,i)=>{
-              const s=p.selectedSKU;
-              return <div key={i} className="prod-out-row">
-                <div><div className="por-name">{s?s.desc:(p.formCat||"Product")}</div>{s&&<div className="por-sku">{s.sku}</div>}{p.painPoint&&<div className="por-pain">{p.painPoint}</div>}</div>
-                <div style={{textAlign:"right"}}>{s&&<div className="por-price">${s.price}</div>}{p.ann&&<div className="por-ann">{fmt(p.ann)} {p.usageUnit}</div>}</div>
-              </div>;
-            })}
-          </div>
-          <div className="out-block">
-            <div style={{fontSize:11,fontWeight:600,marginBottom:8,color:"var(--muted)"}}>SALESFORCE CRM</div>
-            <pre>{output.sfText}</pre>
-          </div>
-          {copied==="sf"&&<div className="copy-ok">✅ Copied to clipboard</div>}
-          <button className="btn btn-accent" onClick={()=>copy(output.sfText,"sf")}>📋 Copy CRM Summary</button>
-          <div className="out-block" style={{marginTop:4}}>
-            <div style={{fontSize:11,fontWeight:600,marginBottom:8,color:"var(--muted)"}}>FOLLOW-UP EMAIL</div>
-            <pre>{output.emailText}</pre>
-          </div>
-          {copied==="email"&&<div className="copy-ok">✅ Copied to clipboard</div>}
-          <button className="btn btn-ghost" onClick={()=>copy(output.emailText,"email")}>📋 Copy Email</button>
-          <button className="btn btn-ghost" onClick={()=>{setForm(newForm());setTab("log");}}>+ Log Another Visit</button>
         </div>
-      )}
 
-      {/* ARCHIVE CONFIRM */}
-      {showArchiveConfirm && (
-        <div className="modal-overlay" onClick={()=>setShowArchiveConfirm(false)}>
-          <div className="modal" onClick={e=>e.stopPropagation()}>
-            <div className="modal-title">Archive Trip?</div>
-            <div className="modal-sub">This will save all visit data and notes, and mark the trip as complete. You can still view it anytime.</div>
-            <button className="btn btn-fire" onClick={archiveCurrentTrip}>✅ Archive & Complete</button>
-            <button className="btn btn-ghost" onClick={()=>setShowArchiveConfirm(false)}>Cancel</button>
+        <button className="btn btn-fire" onClick={generateOutput}>⚡ Generate Output</button>
+        <button className="btn btn-ghost" onClick={()=>{setForm(newForm());setTab("run");}}>Cancel</button>
+      </div>}
+
+      {/* ── CATALOGUE ── */}
+      {tab==="catalogue"&&<div className="content">
+        <input className="search-box" placeholder="Search SKU or description…" value={catSearch} onChange={e=>setCatSearch(e.target.value)}/>
+        {CATEGORIES.map(cat=>{
+          const items=PRICELIST.filter(p=>p.cat===cat&&(!catSearch||(p.sku.toLowerCase().includes(catSearch.toLowerCase())||p.desc.toLowerCase().includes(catSearch.toLowerCase()))));
+          if(!items.length)return null;
+          return(
+            <div key={cat} className="cat-section">
+              <div className="cat-section-title">{cat}</div>
+              {items.map(p=>(
+                <div key={p.sku} className="cat-row" onClick={()=>{setForm(f=>({...f,products:f.products.map((prod,i)=>i===f.products.length-1?{...prod,formCat:cat,selectedSKU:p}:prod)}));setTab("log");}}>
+                  <div className="cat-sku">{p.sku}</div>
+                  <div className="cat-name">{p.desc}</div>
+                  <div style={{textAlign:"right"}}><div className="cat-price">${p.price}</div><div className="cat-unit">{p.unit} · {p.gp}% GP</div></div>
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>}
+
+      {/* ── NOTES ── */}
+      {tab==="notes"&&<div className="content">
+        <div className="sec-label">Voice Notes · {notes.length} saved</div>
+        {!isArchived&&<div className="section-card" style={{marginBottom:14}}>
+          <div className="field"><label className="lbl">Account</label>
+            <select className="inp" value={noteAccount} onChange={e=>setNoteAccount(e.target.value)}>
+              <option value="">General / Trip Note</option>
+              {visits.filter(v=>!v.isTBC).map(v=><option key={v.id} value={v.name}>{v.name} — {v.location}</option>)}
+            </select>
           </div>
+          {showKeyEntry&&<div style={{background:"var(--s2)",border:"1px solid var(--accent)",borderRadius:8,padding:13,marginBottom:11}}>
+            <div className="sec-label" style={{marginBottom:7}}>🔑 OpenAI API Key</div>
+            <div style={{fontSize:12,color:"var(--muted)",marginBottom:9,lineHeight:1.5}}>Saved only on this device.</div>
+            <input type="password" className="inp" style={{marginBottom:7}} placeholder="sk-proj-…" value={keyInput} onChange={e=>setKeyInput(e.target.value)}/>
+            <button className="btn btn-accent" onClick={()=>{if(keyInput.trim().startsWith("sk-")){saveApiKey(keyInput.trim());setKeyInput("");setShowKeyEntry(false);}else setRecordError("Invalid key");}}>Save Key</button>
+            <button className="btn btn-ghost" style={{marginTop:4}} onClick={()=>setShowKeyEntry(false)}>Cancel</button>
+          </div>}
+          {getApiKey()&&!showKeyEntry&&<div style={{textAlign:"right",marginBottom:5}}><button style={{background:"none",border:"none",color:"var(--muted)",fontSize:10,cursor:"pointer"}} onClick={()=>{localStorage.removeItem("xpak_openai_key");setRecordError("Key cleared.");}}>🔑 Clear key</button></div>}
+          <button className={`record-btn ${recordState}`} onClick={recordState==="recording"?stopRecording:startRecording} disabled={recordState==="processing"||recordState==="transcribing"}>
+            {recordState==="idle"&&<><span>🎤</span>Tap to Record</>}
+            {recordState==="recording"&&<><span>⏹</span>Recording… Tap to Stop</>}
+            {recordState==="transcribing"&&<><span>⏳</span>Transcribing…</>}
+            {recordState==="processing"&&<><span>✨</span>Summarising…</>}
+          </button>
+          {transcript&&<textarea className="inp" style={{marginBottom:7}} value={transcript} onChange={e=>setTranscript(e.target.value)}/>}
+          {recordError&&<div className="alert-inline">⚠️ {recordError}</div>}
+          {transcript&&recordState==="idle"&&<button className="btn btn-fire" onClick={summariseNote}>✨ Summarise with AI</button>}
+        </div>}
+        {notes.length===0?<div className="empty-state"><div className="big">🎤</div><div>No notes yet.</div></div>
+          :notes.map(note=>(
+          <div key={note.id} className="note-card">
+            <div className="note-card-header">
+              <div><div className="note-account-name">{note.account}</div><div className="note-time">{note.date} · {note.time}</div></div>
+              {!isArchived&&<button className="del-note" onClick={()=>updateNotes(notes.filter(x=>x.id!==note.id))}>🗑</button>}
+            </div>
+            {note.summary&&<><div className="note-summary-label">AI Summary</div><div className="note-summary">{note.summary}</div></>}
+            {note.raw&&<details style={{marginTop:8}}><summary style={{fontSize:10,color:"var(--muted)",cursor:"pointer",fontFamily:"var(--mono)"}}>Raw transcript ▾</summary><div className="note-raw" style={{marginTop:5}}>{note.raw}</div></details>}
+            <button className="btn btn-ghost" style={{marginTop:10,fontSize:10,padding:"7px",letterSpacing:1}} onClick={()=>copy(`CALL NOTES — ${note.account} (${note.date} ${note.time})\n\n${note.summary}`,"note-"+note.id)}>{copied==="note-"+note.id?"✅ Copied!":"📋 Copy to CRM"}</button>
+          </div>
+        ))}
+      </div>}
+
+      {/* ── OUTPUT ── */}
+      {tab==="output"&&output&&<div className="content">
+        <div className="out-hero">
+          <div className="out-account">{output.accountName}</div>
+          <div style={{fontSize:11,color:"var(--muted)",marginBottom:8}}>📍 {output.location}</div>
+          <div className="out-grid">
+            <div><div className="out-val green">{fmtK(output.totalEAS)}</div><div className="out-lbl">Est. Annual Revenue</div></div>
+            <div><div className="out-val accent">{fmtK(output.totalGPAmt)}</div><div className="out-lbl">Est. Annual GP ({output.avgGP}%)</div></div>
+          </div>
+          <div className={`rank-chip rank-${output.rank}`}>⭐ {output.rank}-Account</div>
         </div>
-      )}
+        {output.alerts.length>0&&<div className="alert-inline">⚠️ {output.alerts.join(" · ")}</div>}
+        <div className="out-block">
+          {output.prods.map((p,i)=>{const s=p.selectedSKU;return<div key={i} className="prod-out-row"><div><div className="por-name">{s?s.desc:(p.formCat||"Product")}</div>{s&&<div className="por-sku">{s.sku}</div>}{p.painPoint&&<div style={{fontSize:10,color:"var(--accent)",marginTop:2}}>{p.painPoint}</div>}</div><div style={{textAlign:"right"}}>{s&&<div className="por-price">${s.price}</div>}{p.ann&&<div className="por-ann">{fmt(p.ann)} {p.usageUnit}</div>}</div></div>;})}
+        </div>
+        <div className="out-block">
+          <div style={{fontSize:10,fontWeight:600,marginBottom:7,color:"var(--muted)"}}>SALESFORCE CRM TEXT</div>
+          <pre>{output.sfText}</pre>
+        </div>
+        {copied==="sf"&&<div className="copy-ok">✅ Copied!</div>}
+        <button className="btn btn-accent" onClick={()=>copy(output.sfText,"sf")}>📋 Copy CRM Summary</button>
+        <div className="out-block" style={{marginTop:4}}>
+          <div style={{fontSize:10,fontWeight:600,marginBottom:7,color:"var(--muted)"}}>FOLLOW-UP EMAIL</div>
+          <pre>{output.emailText}</pre>
+        </div>
+        {copied==="email"&&<div className="copy-ok">✅ Copied!</div>}
+        <button className="btn btn-ghost" onClick={()=>copy(output.emailText,"email")}>📋 Copy Email</button>
+        <button className="btn btn-ghost" onClick={()=>{setForm(newForm());setTab("log");}}>+ Log Another Visit</button>
+      </div>}
+
+      {/* ── EXPORT ── */}
+      {tab==="export"&&<div className="content">
+        <div className="sec-label">Salesforce Export</div>
+
+        {/* Mid-trip MYOB */}
+        <div className="export-card">
+          <div className="export-card-title" style={{color:"var(--blue)"}}>📊 Upload / Update MYOB History</div>
+          <div className="export-card-desc">Already on a trip? Paste your MYOB customer detail export here to add purchase history to all account cards.</div>
+          <textarea className="inp" style={{minHeight:70,fontSize:11}} placeholder="Paste MYOB export here…" onChange={e=>{if(e.target.value)handleMidTripMYOB(e.target.value);}}/>
+          {Object.keys(myobData).length>0&&<div style={{fontSize:11,color:"var(--green)",marginTop:5,fontWeight:600}}>✅ {Object.keys(myobData).length} customers loaded</div>}
+        </div>
+
+        {/* SF Export */}
+        {(()=>{
+          const exp=generateSFExport(visits);
+          const visitedCount=visits.filter(v=>v.visitDetail&&["visited","done","follow"].includes(v.status)).length;
+          return(
+            <div className="export-card">
+              <div className="export-card-title" style={{color:"var(--accent)"}}>☁️ End of Day — Salesforce CSV Export</div>
+              <div className="export-card-desc">
+                Generates <strong style={{color:"var(--text)"}}>two CSV files</strong> for Salesforce Data Import Wizard:<br/><br/>
+                <strong style={{color:"var(--text)"}}>1. Account Updates CSV</strong> — updates EST Annual $, EST Annual GP $, Primary Product, Last Contact Date, Next Contact Date, Visit Frequency, Key Notes, Existing Supplier, Mode of Transport. Match on Account Name.<br/><br/>
+                <strong style={{color:"var(--text)"}}>2. Tasks CSV</strong> — creates a "Sales Visit" task for each account visited, with full comments, due date, and Related To.<br/><br/>
+                {visitedCount>0
+                  ?<span style={{color:"var(--green)",fontWeight:600}}>{visitedCount} visit{visitedCount>1?"s":""} ready to export.</span>
+                  :<span style={{color:"var(--muted)"}}>No visits logged yet — log some visits first.</span>}
+              </div>
+              {exp?<>
+                <button className="btn btn-accent" onClick={()=>downloadCSV(exp.accsCSV,`xpak_accounts_${new Date().toLocaleDateString("en-AU").replace(/\//g,"-")}.csv`)}>⬇️ Download Account Updates CSV</button>
+                <button className="btn btn-blue" onClick={()=>downloadCSV(exp.tasksCSV,`xpak_tasks_${new Date().toLocaleDateString("en-AU").replace(/\//g,"-")}.csv`)}>⬇️ Download Tasks CSV</button>
+                <div style={{fontSize:10,color:"var(--muted)",lineHeight:1.7,marginTop:4}}>
+                  <strong style={{color:"var(--text)"}}>Import steps:</strong><br/>
+                  1. SF → Setup → Data Import Wizard → Accounts & Contacts → Update → match on Account Name → upload Account Updates CSV<br/>
+                  2. SF → Setup → Data Import Wizard → Activities → Insert → upload Tasks CSV
+                </div>
+              </>:<div style={{fontSize:12,color:"var(--muted)",textAlign:"center",padding:"10px 0"}}>Log some visits to generate export.</div>}
+            </div>
+          );
+        })()}
+      </div>}
+
+      {/* ARCHIVE MODAL */}
+      {showArchiveConfirm&&<div className="modal-overlay" onClick={()=>setShowArchiveConfirm(false)}>
+        <div className="modal" onClick={e=>e.stopPropagation()}>
+          <div className="modal-title">Archive Trip?</div>
+          <div className="modal-sub">All visit data and notes are saved. You can still view this trip anytime.</div>
+          <button className="btn btn-fire" onClick={archiveTrip}>✅ Archive & Complete</button>
+          <button className="btn btn-ghost" onClick={()=>setShowArchiveConfirm(false)}>Cancel</button>
+        </div>
+      </div>}
     </div>
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>
