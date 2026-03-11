@@ -260,62 +260,56 @@ textarea.inp{min-height:80px;resize:none;line-height:1.5;font-size:14px}
 <body>
 <div id="root"></div>
 
-<!-- Firebase SDK -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<!-- Firebase Compat SDK (works on all browsers / GitHub Pages) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+(function() {
+  try {
+    const firebaseConfig = {
+      apiKey: "AIzaSyChsz_uG6d2I1eIMpwjJWikCVMuLevnW2A",
+      authDomain: "xpak-field-sales.firebaseapp.com",
+      projectId: "xpak-field-sales",
+      storageBucket: "xpak-field-sales.firebasestorage.app",
+      messagingSenderId: "1081261518456",
+      appId: "1:1081261518456:web:9852b74954f3b81376478d"
+    };
 
-const firebaseConfig = {
-  apiKey: "AIzaSyChsz_uG6d2I1eIMpwjJWikCVMuLevnW2A",
-  authDomain: "xpak-field-sales.firebaseapp.com",
-  projectId: "xpak-field-sales",
-  storageBucket: "xpak-field-sales.firebasestorage.app",
-  messagingSenderId: "1081261518456",
-  appId: "1:1081261518456:web:9852b74954f3b81376478d"
-};
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp);
+    window.FB = {
+      saveTrips: async (trips) => {
+        await db.collection("xpak").doc("trips").set({ trips, updatedAt: Date.now() });
+      },
+      loadTrips: async () => {
+        const snap = await db.collection("xpak").doc("trips").get();
+        return snap.exists ? snap.data().trips : [];
+      },
+      saveVisits: async (tripId, visits) => {
+        await db.collection("xpak_visits").doc(tripId).set({ visits, updatedAt: Date.now() });
+      },
+      loadVisits: async (tripId) => {
+        const snap = await db.collection("xpak_visits").doc(tripId).get();
+        return snap.exists ? snap.data().visits : [];
+      },
+      saveNotes: async (tripId, notes) => {
+        await db.collection("xpak_notes").doc(tripId).set({ notes, updatedAt: Date.now() });
+      },
+      loadNotes: async (tripId) => {
+        const snap = await db.collection("xpak_notes").doc(tripId).get();
+        return snap.exists ? snap.data().notes : [];
+      },
+    };
 
-// Expose DB helpers to window for React to use
-window.FB = {
-  // Save trips list
-  saveTrips: async (trips) => {
-    await setDoc(doc(db, "xpak", "trips"), { trips, updatedAt: Date.now() });
-  },
-  // Load trips list
-  loadTrips: async () => {
-    const snap = await getDoc(doc(db, "xpak", "trips"));
-    return snap.exists() ? snap.data().trips : [];
-  },
-  // Save visits for a trip
-  saveVisits: async (tripId, visits) => {
-    await setDoc(doc(db, "xpak_visits", tripId), { visits, updatedAt: Date.now() });
-  },
-  // Load visits for a trip
-  loadVisits: async (tripId) => {
-    const snap = await getDoc(doc(db, "xpak_visits", tripId));
-    return snap.exists() ? snap.data().visits : [];
-  },
-  // Save notes for a trip
-  saveNotes: async (tripId, notes) => {
-    await setDoc(doc(db, "xpak_notes", tripId), { notes, updatedAt: Date.now() });
-  },
-  // Load notes for a trip
-  loadNotes: async (tripId) => {
-    const snap = await getDoc(doc(db, "xpak_notes", tripId));
-    return snap.exists() ? snap.data().notes : [];
-  },
-  // Listen to trips changes (realtime)
-  listenTrips: (callback) => {
-    return onSnapshot(doc(db, "xpak", "trips"), (snap) => {
-      if(snap.exists()) callback(snap.data().trips || []);
-    });
+    window.FB_READY = true;
+    window.dispatchEvent(new Event("fb-ready"));
+  } catch(e) {
+    console.warn("Firebase init failed:", e);
+    window.FB_READY = false;
+    window.dispatchEvent(new Event("fb-ready"));
   }
-};
-
-window.FB_READY = true;
-window.dispatchEvent(new Event("fb-ready"));
+})();
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
