@@ -557,24 +557,26 @@ function GuestForm({ guest, onClose, onSave }) {
 
 // ── Summary / print ─────────────────────────────────────────────────────
 function SummaryTab({ round, hosts, guests }) {
-  function print() {
-    const rows = hosts
-      .map(h => ({ h, assigned: guests.filter(g => g.host_id === h.id) }))
-      .filter(({ assigned }) => assigned.length > 0)
-      .map(({ h, assigned }) => {
-        const items = assigned.map(g => `
-          <tr>
-            <td>${g.contact_name}</td>
-            <td>${g.party_size}</td>
-            <td>${fmtDate(g.arrival_date)} → ${fmtDate(g.departure_date)}</td>
-          </tr>`).join('')
-        return `
-          <h2>${h.name}</h2>
-          <table><thead><tr><th>Guest</th><th>People</th><th>Dates</th></tr></thead><tbody>${items}</tbody></table>
-        `
-      }).join('')
+  const hostsWithGuests = hosts
+    .map(h => ({ h, assigned: guests.filter(g => g.host_id === h.id) }))
+    .filter(({ assigned }) => assigned.length > 0)
+  const unassigned = guests.filter(g => !g.host_id)
+  const generatedDate = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
 
-    const unassigned = guests.filter(g => !g.host_id)
+  function print() {
+    const rows = hostsWithGuests.map(({ h, assigned }) => {
+      const items = assigned.map(g => `
+        <tr>
+          <td>${g.contact_name}</td>
+          <td>${g.party_size}</td>
+          <td>${fmtDate(g.arrival_date)} → ${fmtDate(g.departure_date)}</td>
+        </tr>`).join('')
+      return `
+        <h2>${h.name}</h2>
+        <table><thead><tr><th>Guest</th><th>People</th><th>Dates</th></tr></thead><tbody>${items}</tbody></table>
+      `
+    }).join('')
+
     const unassignedRows = unassigned.map(g => `
       <tr>
         <td>${g.contact_name}</td>
@@ -582,19 +584,19 @@ function SummaryTab({ round, hosts, guests }) {
         <td>${fmtDate(g.arrival_date)} → ${fmtDate(g.departure_date)}</td>
       </tr>`).join('')
 
-    const generatedDate = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
-
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${round.name} — Summary</title>
       <style>
         body { font-family: Arial, sans-serif; padding: 24px; color: #0F2942; }
-        h1 { margin-bottom: 20px; }
+        h1 { margin-bottom: 4px; }
+        .meta { font-size: 12px; font-weight: normal; color: #7F8C8D; margin: 0 0 16px; }
         h2 { margin-top: 28px; margin-bottom: 6px; font-size: 16px; border-bottom: 2px solid #E8A838; padding-bottom: 4px; }
         table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #eee; font-size: 13px; }
         th { color: #7F8C8D; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
         @media print { body { padding: 0; } }
       </style></head><body>
-      <h1>Summary - generated ${generatedDate}</h1>
+      <h1>${round.name}</h1>
+      <p class="meta">Summary - generated ${generatedDate}</p>
       ${rows}
       ${unassigned.length ? `
         <h2>Unassigned</h2>
@@ -608,16 +610,42 @@ function SummaryTab({ round, hosts, guests }) {
     w.document.close()
   }
 
+  function email() {
+    const lines = [round.name, `Summary - generated ${generatedDate}`, '']
+    hostsWithGuests.forEach(({ h, assigned }) => {
+      lines.push(h.name)
+      assigned.forEach(g => {
+        lines.push(`  ${g.contact_name} · ${g.party_size}p · ${fmtDate(g.arrival_date)} → ${fmtDate(g.departure_date)}`)
+      })
+      lines.push('')
+    })
+    if (unassigned.length) {
+      lines.push('Unassigned')
+      unassigned.forEach(g => {
+        lines.push(`  ${g.contact_name} · ${g.party_size}p · ${fmtDate(g.arrival_date)} → ${fmtDate(g.departure_date)}`)
+      })
+    }
+
+    const subject = `${round.name} — Summary (${generatedDate})`
+    const body = lines.join('\n').trim()
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+  }
+
   return (
     <div>
       <div style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 1px 6px rgba(0,0,0,0.06)', marginBottom: 16 }}>
         <div style={{ fontWeight: 700, fontSize: 15, color: '#0F2942', marginBottom: 6 }}>Print / Export Summary</div>
         <p style={{ fontSize: 13, color: '#7F8C8D', marginBottom: 16, lineHeight: 1.5 }}>
-          A basic list of who's staying with each host and for how long — handy to print or save as PDF.
+          A basic list of who's staying with each host and for how long — handy to print, save as PDF, or email.
         </p>
-        <button onClick={print} style={{ padding: '12px 24px', background: '#E8A838', color: '#0F2942', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-          Open Printable Summary
-        </button>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <button onClick={print} style={{ padding: '12px 24px', background: '#E8A838', color: '#0F2942', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+            Open Printable Summary
+          </button>
+          <button onClick={email} style={{ padding: '12px 24px', background: '#fff', color: '#0F2942', border: '1.5px solid #0F2942', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+            Email Summary
+          </button>
+        </div>
       </div>
 
       {hosts.map(h => {
