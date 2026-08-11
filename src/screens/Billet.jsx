@@ -558,21 +558,21 @@ function GuestForm({ guest, onClose, onSave }) {
 // ── Summary / print ─────────────────────────────────────────────────────
 function SummaryTab({ round, hosts, guests }) {
   function print() {
-    const rows = hosts.map(h => {
-      const assigned = guests.filter(g => g.host_id === h.id)
-      const items = assigned.map(g => `
-        <tr>
-          <td>${g.contact_name}</td>
-          <td>${g.party_size}</td>
-          <td>${fmtDate(g.arrival_date)} → ${fmtDate(g.departure_date)}</td>
-          <td>${g.phone || ''}</td>
-          <td>${g.notes || ''}</td>
-        </tr>`).join('')
-      return `
-        <h2>${h.name} <span class="meta">${h.contact || ''}${h.locality ? ' · ' + h.locality : ''} · capacity ${h.capacity}</span></h2>
-        ${assigned.length ? `<table><thead><tr><th>Guest</th><th>People</th><th>Dates</th><th>Phone</th><th>Notes</th></tr></thead><tbody>${items}</tbody></table>` : '<p class="none">No guests assigned</p>'}
-      `
-    }).join('')
+    const rows = hosts
+      .map(h => ({ h, assigned: guests.filter(g => g.host_id === h.id) }))
+      .filter(({ assigned }) => assigned.length > 0)
+      .map(({ h, assigned }) => {
+        const items = assigned.map(g => `
+          <tr>
+            <td>${g.contact_name}</td>
+            <td>${g.party_size}</td>
+            <td>${fmtDate(g.arrival_date)} → ${fmtDate(g.departure_date)}</td>
+          </tr>`).join('')
+        return `
+          <h2>${h.name}</h2>
+          <table><thead><tr><th>Guest</th><th>People</th><th>Dates</th></tr></thead><tbody>${items}</tbody></table>
+        `
+      }).join('')
 
     const unassigned = guests.filter(g => !g.host_id)
     const unassignedRows = unassigned.map(g => `
@@ -580,26 +580,26 @@ function SummaryTab({ round, hosts, guests }) {
         <td>${g.contact_name}</td>
         <td>${g.party_size}</td>
         <td>${fmtDate(g.arrival_date)} → ${fmtDate(g.departure_date)}</td>
-        <td>${g.phone || ''}</td>
       </tr>`).join('')
 
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${round.name} — Billeting Summary</title>
+    const generatedDate = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
+
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${round.name} — Summary</title>
       <style>
         body { font-family: Arial, sans-serif; padding: 24px; color: #0F2942; }
-        h1 { margin-bottom: 4px; }
+        h1 { margin-bottom: 20px; }
         h2 { margin-top: 28px; margin-bottom: 6px; font-size: 16px; border-bottom: 2px solid #E8A838; padding-bottom: 4px; }
-        .meta { font-size: 12px; font-weight: normal; color: #7F8C8D; }
         table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #eee; font-size: 13px; }
         th { color: #7F8C8D; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
-        .none { color: #BDC3C7; font-size: 13px; font-style: italic; }
         @media print { body { padding: 0; } }
       </style></head><body>
-      <h1>${round.name}</h1>
-      <p class="meta">Billeting summary — generated ${new Date().toLocaleDateString('en-AU')}</p>
+      <h1>Summary - generated ${generatedDate}</h1>
       ${rows}
-      <h2>Unassigned <span class="meta">${unassigned.length} parties</span></h2>
-      ${unassigned.length ? `<table><thead><tr><th>Guest</th><th>People</th><th>Dates</th><th>Phone</th></tr></thead><tbody>${unassignedRows}</tbody></table>` : '<p class="none">None — everyone is placed</p>'}
+      ${unassigned.length ? `
+        <h2>Unassigned</h2>
+        <table><thead><tr><th>Guest</th><th>People</th><th>Dates</th></tr></thead><tbody>${unassignedRows}</tbody></table>
+      ` : ''}
       <script>setTimeout(() => window.print(), 400)</script>
       </body></html>`
 
@@ -613,7 +613,7 @@ function SummaryTab({ round, hosts, guests }) {
       <div style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 1px 6px rgba(0,0,0,0.06)', marginBottom: 16 }}>
         <div style={{ fontWeight: 700, fontSize: 15, color: '#0F2942', marginBottom: 6 }}>Print / Export Summary</div>
         <p style={{ fontSize: 13, color: '#7F8C8D', marginBottom: 16, lineHeight: 1.5 }}>
-          A per-host list of who's staying, with contact details — handy to print or save as PDF and pass along to guests.
+          A basic list of who's staying with each host and for how long — handy to print or save as PDF.
         </p>
         <button onClick={print} style={{ padding: '12px 24px', background: '#E8A838', color: '#0F2942', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
           Open Printable Summary
